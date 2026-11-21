@@ -46,7 +46,7 @@ button { cursor: pointer; }
 .ic.fill { fill: currentColor; stroke: none; }
 
 /* ---------- App layout ---------- */
-#app { position: fixed; inset: 0; display: grid; grid-template-rows: 34px 1fr 24px; }
+#app { position: fixed; inset: 0; display: grid; grid-template-rows: 34px 1fr auto 24px; }
 #topbar { display: flex; align-items: center; gap: 4px; padding: 0 8px; background: var(--bg1); border-bottom: 1px solid var(--line); min-width: 0; z-index: 20; }
 #main { display: grid; grid-template-columns: 1fr 5px var(--right-w); min-height: 0; position: relative; }
 #statusbar { display: flex; align-items: center; gap: 14px; padding: 0 10px; background: var(--bg1); border-top: 1px solid var(--line); color: var(--txt2); font-size: 11px; white-space: nowrap; overflow: hidden; }
@@ -181,7 +181,7 @@ button { cursor: pointer; }
 .ptab:hover { background: var(--bg4); color: var(--txt); }
 .ptab.on { background: var(--bg4); color: var(--txt); box-shadow: inset 2px 0 0 var(--accent); }
 .ptab .ic { width: 17px; height: 17px; }
-.ptab.t-render { color: #9fc1ff; } .ptab.t-world { color: #ff8a8a; } .ptab.t-object { color: #ffad5c; } .ptab.t-data { color: #7fdc9a; } .ptab.t-material { color: #ff8acb; } .ptab.t-scene { color: #c7a0ff; }
+.ptab.t-render { color: #9fc1ff; } .ptab.t-world { color: #ff8a8a; } .ptab.t-object { color: #ffad5c; } .ptab.t-data { color: #7fdc9a; } .ptab.t-material { color: #ff8acb; } .ptab.t-modifiers { color: #7fb0ff; } .ptab.t-scene { color: #c7a0ff; }
 #propBody { flex: 1; overflow-y: auto; padding: 6px 6px 40px; min-width: 0; }
 .prop-head { display: flex; align-items: center; gap: 7px; padding: 4px 6px 8px; font-weight: 600; }
 .prop-head .ic { color: var(--sel); }
@@ -335,6 +335,28 @@ body.dragging-file #dropZone { display: grid; }
 #app.max #main { grid-template-columns: 1fr 0 0; }
 #app.max #right, #app.max .splitter.v { display: none; }
 
+/* ---------- Timeline ---------- */
+#timeline { display: flex; flex-direction: column; height: 74px; background: var(--bg2); border-top: 1px solid var(--line); min-width: 0; }
+#timeline.collapsed { height: 30px; }
+#timeline.collapsed #tlCanvas { display: none; }
+.tl-ctrls { display: flex; align-items: center; gap: 3px; height: 30px; padding: 0 8px; background: var(--bg3); border-bottom: 1px solid var(--line); flex: none; overflow-x: auto; scrollbar-width: none; }
+.tl-ctrls::-webkit-scrollbar { display: none; }
+.tl-ctrls .num { width: 96px; flex: none; }
+.tl-ctrls .lbl { color: var(--txt2); font-size: 11px; margin: 0 2px 0 6px; white-space: nowrap; }
+#tlRec.on { color: #ff5a5a; background: rgba(255,80,80,.14); border-color: rgba(255,80,80,.5); }
+#tlPlay.on { color: #fff; background: var(--accent); }
+#tlCanvas { flex: 1; width: 100%; min-height: 0; display: block; cursor: col-resize; touch-action: none; }
+.num.animated { background: #3d5f3a; } .num.animated:hover { background: #4a7046; }
+.num.keyed { background: #7d6a22; } .num.keyed:hover { background: #8f7a28; }
+.mod-head { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 6px 0 8px; background: linear-gradient(var(--bg4), var(--bg3)); font-weight: 600; cursor: pointer; }
+.mod-head .grow { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mod-head .rb { width: 22px; height: 20px; border: 0; background: transparent; color: var(--txt2); border-radius: 4px; display: grid; place-items: center; }
+.mod-head .rb:hover { background: var(--bg6); color: #fff; }
+.mod-head .rb.off { opacity: .35; }
+.mod-icon { color: #7fb0ff; }
+#selModeSeg { display: none; }
+#vpArea.editing #selModeSeg { display: inline-flex; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1180px) { .ws-tabs { display: none; } }
 @media (max-width: 900px) {
@@ -349,6 +371,7 @@ body.dragging-file #dropZone { display: grid; }
   #vpInfo { font-size: 11px; }
 }
 @media (max-width: 620px) {
+  .tl-ctrls .lbl, .tl-ctrls .opt { display: none; }
   #topbar .menubar .mbtn { padding: 0 6px; }
   .badge .bt { display: none; }
   .hide-sm { display: none !important; }
@@ -448,6 +471,26 @@ body.dragging-file #dropZone { display: grid; }
 <symbol id="i-random" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.3" fill="currentColor"/><circle cx="16" cy="16" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></symbol>
 <symbol id="i-merge" viewBox="0 0 24 24"><path d="M4 4l8 8 8-8M12 12v9"/></symbol>
 <symbol id="i-demo" viewBox="0 0 24 24"><path d="M12 2l2.6 6.4L21 9l-5 4.4L17.6 20 12 16.6 6.4 20 8 13.4 3 9l6.4-.6z"/></symbol>
+<symbol id="i-edge" viewBox="0 0 24 24"><path d="M6 18L18 6" stroke-width="2.6"/><rect x="3" y="15" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/></symbol>
+<symbol id="i-face" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M7 8h10v8H7z" fill="currentColor" stroke="none" opacity=".75"/></symbol>
+<symbol id="i-vertsel" viewBox="0 0 24 24"><path d="M4 20V8h12" opacity=".55"/><rect x="13" y="4" width="7" height="7" rx="1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-prop" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-dasharray="2.2 2.2"/><path d="M5 16c3 0 4-8 7-8s4 8 7 8"/></symbol>
+<symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z" fill="currentColor"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-skip-start" viewBox="0 0 24 24"><path d="M6 5v14M18 5l-9 7 9 7z"/></symbol>
+<symbol id="i-skip-end" viewBox="0 0 24 24"><path d="M18 5v14M6 5l9 7-9 7z"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><path d="M12 3l7.5 9-7.5 9-7.5-9z"/></symbol>
+<symbol id="i-key-del" viewBox="0 0 24 24"><path d="M12 3l7.5 9-7.5 9-7.5-9z"/><path d="M9 12h6"/></symbol>
+<symbol id="i-record" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-extrude" viewBox="0 0 24 24"><path d="M3 15l9 4.5 9-4.5-9-4.5z"/><path d="M12 10.5V3M9 6l3-3 3 3"/></symbol>
+<symbol id="i-subdivide" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M12 4v16M4 12h16"/></symbol>
+<symbol id="i-mirror" viewBox="0 0 24 24"><path d="M12 3v18" stroke-dasharray="2 2"/><path d="M9 6L3 18h6zM15 6l6 12h-6z"/></symbol>
+<symbol id="i-array" viewBox="0 0 24 24"><rect x="2.5" y="8" width="5" height="8" rx="1"/><rect x="9.5" y="8" width="5" height="8" rx="1"/><rect x="16.5" y="8" width="5" height="8" rx="1"/></symbol>
+<symbol id="i-solidify" viewBox="0 0 24 24"><path d="M3 9l9-4 9 4-9 4zM3 9v4l9 4 9-4V9"/></symbol>
+<symbol id="i-smoothmod" viewBox="0 0 24 24"><path d="M3 17c4-8 6 2 9-4s5-6 9-2"/><path d="M3 21h18" opacity=".5"/></symbol>
+<symbol id="i-fill" viewBox="0 0 24 24"><path d="M5 19L12 5l7 14z" fill="currentColor" fill-opacity=".35"/></symbol>
+<symbol id="i-timeline" viewBox="0 0 24 24"><path d="M3 7h18M3 17h18M8 4v6M15 14v6"/></symbol>
 <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
 </defs>
 </svg>
@@ -485,6 +528,11 @@ body.dragging-file #dropZone { display: grid; }
     <section id="vpArea">
       <div class="editor-header" id="vpHeader">
         <button class="drop" id="modeBtn" data-tip="Interaction Mode|Tab"><svg class="ic sm"><use href="#i-object"/></svg><span>Object Mode</span><svg class="ic chev"><use href="#i-chev"/></svg></button>
+        <div class="seg" id="selModeSeg">
+          <button data-selmode="vert" class="on" data-tip="Vertex Select|1"><svg class="ic sm"><use href="#i-vertsel"/></svg></button>
+          <button data-selmode="edge" data-tip="Edge Select|2"><svg class="ic sm"><use href="#i-edge"/></svg></button>
+          <button data-selmode="face" data-tip="Face Select|3"><svg class="ic sm"><use href="#i-face"/></svg></button>
+        </div>
         <nav class="menubar" id="vpMenus">
           <button class="mbtn" data-menu="view">View</button>
           <button class="mbtn" data-menu="select">Select</button>
@@ -498,6 +546,7 @@ body.dragging-file #dropZone { display: grid; }
           <button id="snapBtn" data-tip="Snapping|Shift Tab · hold Ctrl while transforming"><svg class="ic sm"><use href="#i-magnet"/></svg></button>
           <button id="snapMenuBtn" data-tip="Snap Increment"><svg class="ic sm chev"><use href="#i-chev"/></svg></button>
         </div>
+        <button class="tbtn" id="propBtn" data-tip="Proportional Editing|O · scroll wheel while transforming to change the radius"><svg class="ic sm"><use href="#i-prop"/></svg></button>
         <div class="hsep"></div>
         <div class="seg">
           <button id="overlayBtn" class="on" data-tip="Show Overlays|Shift Alt Z"><svg class="ic sm"><use href="#i-overlay"/></svg></button>
@@ -562,6 +611,25 @@ body.dragging-file #dropZone { display: grid; }
     </aside>
   </main>
 
+  <section id="timeline">
+    <div class="tl-ctrls">
+      <button class="tbtn" id="tlToggle" data-tip="Collapse Timeline"><svg class="ic sm"><use href="#i-timeline"/></svg></button>
+      <div class="hsep"></div>
+      <button class="tbtn" id="tlStart" data-tip="Jump to Start|Shift ←"><svg class="ic sm"><use href="#i-skip-start"/></svg></button>
+      <button class="tbtn opt" id="tlPrevKey" data-tip="Previous Keyframe|↓"><svg class="ic sm"><use href="#i-chev-l"/></svg></button>
+      <button class="tbtn" id="tlPlay" data-tip="Play / Pause|Space"><svg class="ic sm"><use href="#i-play"/></svg></button>
+      <button class="tbtn opt" id="tlNextKey" data-tip="Next Keyframe|↑"><svg class="ic sm"><use href="#i-chev-r"/></svg></button>
+      <button class="tbtn" id="tlEnd" data-tip="Jump to End|Shift →"><svg class="ic sm"><use href="#i-skip-end"/></svg></button>
+      <div class="hsep"></div>
+      <button class="tbtn" id="tlRec" data-tip="Auto Keying|Insert keyframes automatically when transforming"><svg class="ic sm"><use href="#i-record"/></svg></button>
+      <button class="tbtn" id="tlKey" data-tip="Insert Keyframe|I · location, rotation & scale of selected objects"><svg class="ic sm"><use href="#i-key"/></svg></button>
+      <button class="tbtn opt" id="tlKeyDel" data-tip="Delete Keyframe|Alt I"><svg class="ic sm"><use href="#i-key-del"/></svg></button>
+      <div class="spacer"></div>
+      <div id="tlFields" style="display:flex;align-items:center;gap:3px"></div>
+    </div>
+    <canvas id="tlCanvas"></canvas>
+  </section>
+
   <footer id="statusbar"><div id="hints" style="display:flex;gap:14px"></div><div id="statusRight"></div></footer>
 </div>
 
@@ -572,7 +640,7 @@ body.dragging-file #dropZone { display: grid; }
 <input type="file" id="fileInput" hidden>
 <script type="module">
 import * as THREE from 'three/webgpu';
-import { pass, uniform, renderOutput, vec4 } from 'three/tsl';
+import { pass, uniform, renderOutput, vec4, vec3, frontFacing } from 'three/tsl';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -674,13 +742,13 @@ renderer.shadowMap.type = THREE.PCFShadowMap;
    ===================================================================== */
 const S = {
   mode: 'object', tool: 'select', shading: 'solid', xray: false, overlays: true,
-  ov: { grid: true, axes: true, origins: true, cursor: true, outline: true, stats: false, wireframe: false },
+  ov: { grid: true, axes: true, origins: true, cursor: true, outline: true, stats: false, wireframe: false, faceOrient: false },
   solid: { color: 'material', single: '#bdbdbd', bg: '#393939' },
   world: { lighting: 'sky', color: '#3a3d44', strength: 0.8, showBg: true, blur: 0.35, bg: '#2c2e33',
            skyTop: '#3f6fb8', skyHorizon: '#c9d8e8', skyGround: '#4b4540', fog: false, fogColor: '#a9b6c4', fogDensity: 0.02 },
   render: { shadows: true, shadowRes: 2048, tone: 'agx', exposure: 0, msaa: true, scale: 1, width: 1920, height: 1080,
             bloom: false, bloomStrength: 0.6, bloomRadius: 0.4, bloomThreshold: 0.85, outlineWidth: 1 },
-  orientation: 'global', pivot: 'median', snap: false, snapInc: 1, rotInc: 15,
+  orientation: 'global', pivot: 'median', snap: false, snapInc: 1, rotInc: 15, prop: { on: false, radius: 1 },
 };
 const TONE = { agx: THREE.AgXToneMapping, aces: THREE.ACESFilmicToneMapping, neutral: THREE.NeutralToneMapping, reinhard: THREE.ReinhardToneMapping, none: THREE.NoToneMapping };
 const COL = { sel: 0xff8a1f, act: 0xffbf5e, idle: 0x0b0b0b };
@@ -839,7 +907,7 @@ function getSky() {
    ===================================================================== */
 let needsRender = true;
 const requestRender = () => { needsRender = true; };
-const dirty = { outliner: true, props: true, sidebar: true, fields: true, stats: true, info: true, hints: true };
+const dirty = { outliner: true, props: true, sidebar: true, fields: true, stats: true, info: true, hints: true, timeline: true };
 const markUI = (...keys) => { for (const k of keys) dirty[k] = true; requestRender(); };
 
 /* =====================================================================
@@ -859,6 +927,8 @@ function loadFont() {
 const rx = g => g.rotateX(Math.PI / 2);
 const PRIMS = {
   plane:    { name: 'Plane', icon: 'plane', smooth: false, params: { size: 2, subdivisions: 1 },
+              build: p => new THREE.PlaneGeometry(p.size, p.size, p.subdivisions, p.subdivisions) },
+  grid:     { name: 'Grid', icon: 'grid', smooth: false, params: { size: 2, subdivisions: 10 },
               build: p => new THREE.PlaneGeometry(p.size, p.size, p.subdivisions, p.subdivisions) },
   cube:     { name: 'Cube', icon: 'cube', smooth: false, params: { size: 2, segments: 1 },
               build: p => new THREE.BoxGeometry(p.size, p.size, p.size, p.segments, p.segments, p.segments) },
@@ -960,7 +1030,7 @@ function newMesh(prim, params = {}, opts = {}) {
   const o = new THREE.Mesh(opts.geometry || buildPrimGeometry(prim, p, smooth), mat);
   o.rotation.order = 'ZYX';
   o.castShadow = o.receiveShadow = true;
-  o.userData = { kind: 'mesh', id: nextId++, prim, params: opts.custom ? null : p, mat, smooth };
+  o.userData = { kind: 'mesh', id: nextId++, prim, params: opts.custom ? null : p, mat, smooth, data: o.geometry, mods: [], keys: [] };
   o.name = uniqueName(opts.name || def.name);
   if (prim === 'text' && !FONT) loadFont().then(() => { if (o.userData.params) regenerate(o); });
   o.material = meshMaterialFor(o);
@@ -974,9 +1044,9 @@ function newCustomMesh(geometry, name, matProps) {
 function regenerate(o) {
   const u = o.userData;
   if (!u.params) return;
-  const old = o.geometry;
-  o.geometry = buildPrimGeometry(u.prim, u.params, u.smooth && !PRIMS[u.prim].smooth);
-  if (!historyGeos.has(old)) old.dispose();
+  const old = u.data;
+  setGeo(o, buildPrimGeometry(u.prim, u.params, u.smooth && !PRIMS[u.prim].smooth));
+  if (!historyGeos.has(old) && old !== u.data) old.dispose();
   markUI('stats', 'fields'); requestRender();
 }
 
@@ -985,7 +1055,7 @@ const LIGHT_DEFAULTS = { point: { intensity: 120, name: 'Point' }, sun: { intens
 function newLight(type = 'point', opts = {}) {
   const g = new THREE.Group();
   g.rotation.order = 'ZYX';
-  g.userData = { kind: 'light', id: nextId++, lightType: type, castShadow: true, lineMat: lineMat() };
+  g.userData = { kind: 'light', id: nextId++, lightType: type, castShadow: true, lineMat: lineMat(), keys: [] };
   g.name = uniqueName(opts.name || LIGHT_DEFAULTS[type].name);
   setLightType(g, type, true);
   return g;
@@ -1061,7 +1131,7 @@ function newCamera(opts = {}) {
   const cam = new THREE.PerspectiveCamera(40, renderAspect(), 0.1, 1000);
   cam.filmGauge = 36;
   g.add(cam);
-  g.userData = { kind: 'camera', id: nextId++, cam, lens: 50, lineMat: lineMat() };
+  g.userData = { kind: 'camera', id: nextId++, cam, lens: 50, lineMat: lineMat(), keys: [] };
   g.name = uniqueName(opts.name || 'Camera');
   updateCameraLens(g);
   return g;
@@ -1086,7 +1156,7 @@ function updateCameraLens(g) {
 function newEmpty(opts = {}) {
   const g = new THREE.Group();
   g.rotation.order = 'ZYX';
-  g.userData = { kind: 'empty', id: nextId++, size: opts.size ?? 1, lineMat: lineMat() };
+  g.userData = { kind: 'empty', id: nextId++, size: opts.size ?? 1, lineMat: lineMat(), keys: [] };
   g.name = uniqueName(opts.name || 'Empty');
   setEmptySize(g, g.userData.size);
   return g;
@@ -1120,11 +1190,13 @@ function geoFromJSON(j) {
 }
 function serialize(o, forFile = false) {
   const u = o.userData;
-  const d = { kind: u.kind, name: o.name, p: o.position.toArray(), q: o.quaternion.toArray(), s: o.scale.toArray(), visible: o.visible, noSelect: !!u.noSelect };
+  const d = { kind: u.kind, name: o.name, p: o.position.toArray(), q: o.quaternion.toArray(), s: o.scale.toArray(), visible: o.visible || !!u.localHidden, noSelect: !!u.noSelect,
+    keys: (u.keys || []).map(k => ({ f: k.f, p: [...k.p], q: [...k.q], s: [...k.s] })) };
   if (u.kind === 'mesh') {
-    Object.assign(d, { prim: u.prim, params: u.params ? { ...u.params } : null, smooth: u.smooth, mat: readMat(u.mat), cast: o.castShadow, receive: o.receiveShadow });
-    if (forFile) { d.mat.map = null; if (!u.params) d.geometry = geoToJSON(o.geometry); }
-    else d.geometry = o.geometry;
+    Object.assign(d, { prim: u.prim, params: u.params ? { ...u.params } : null, smooth: u.smooth, mat: readMat(u.mat), cast: o.castShadow, receive: o.receiveShadow,
+      mods: (u.mods || []).map(m => JSON.parse(JSON.stringify(m))) });
+    if (forFile) { d.mat.map = null; if (!u.params) d.geometry = geoToJSON(geoOf(o)); }
+    else d.geometry = geoOf(o);
   } else if (u.kind === 'light') d.light = readLight(o);
   else if (u.kind === 'camera') d.cam = { lens: u.lens, near: u.cam.near, far: u.cam.far };
   else if (u.kind === 'empty') d.size = u.size;
@@ -1134,9 +1206,12 @@ function applyData(o, d) {
   const u = o.userData;
   o.name = d.name; o.position.fromArray(d.p); o.quaternion.fromArray(d.q); o.scale.fromArray(d.s);
   o.visible = d.visible; u.noSelect = d.noSelect;
+  u.keys = (d.keys || []).map(k => ({ f: k.f, p: [...k.p], q: [...k.q], s: [...k.s] }));
   if (u.kind === 'mesh') {
-    if (d.geometry && d.geometry.isBufferGeometry && o.geometry !== d.geometry) o.geometry = d.geometry;
+    if (d.geometry && d.geometry.isBufferGeometry) u.data = d.geometry;
     u.prim = d.prim; u.params = d.params ? { ...d.params } : null; u.smooth = d.smooth;
+    u.mods = (d.mods || []).map(m => JSON.parse(JSON.stringify(m)));
+    evalMods(o);
     writeMat(u.mat, d.mat); syncSolidMat(o);
     o.castShadow = d.cast; o.receiveShadow = d.receive;
   } else if (u.kind === 'light') writeLight(o, d.light);
@@ -1182,6 +1257,7 @@ function syncSolidMat(o) {
   if (flags[0] !== m.flatShading || flags[1] !== m.side || flags[2] !== m.transparent) m.needsUpdate = true;
 }
 function meshMaterialFor(o) {
+  if (S.overlays && S.ov.faceOrient && S.shading !== 'wire') return faceOrientMat;
   if (S.shading === 'wire') return o === active && sel.has(o) ? wireMats.act : sel.has(o) ? wireMats.sel : wireMats.idle;
   if (S.shading === 'solid') return solidMatFor(o);
   return o.userData.mat;
@@ -1241,7 +1317,7 @@ function onSelChanged() {
   if (active && !active.parent) active = null;
   updateSelectionVisuals();
   lastOpHide();
-  markUI('outliner', 'props', 'sidebar', 'stats', 'info');
+  markUI('outliner', 'props', 'sidebar', 'stats', 'info', 'timeline');
 }
 function updateSelectionVisuals() {
   outlineSel.length = 0;
@@ -1274,16 +1350,18 @@ function snapshot(label) {
   return { label, objs, sel: [...sel], active };
 }
 function pushHistory(label) {
+  if (anim.autoKey && S.mode === 'object' && AUTOKEY_LABELS.has(label)) insertKeys(true);
   hist.stack.length = hist.index + 1;
   hist.stack.push(snapshot(label));
   if (hist.stack.length > 120) hist.stack.shift();
   hist.index = hist.stack.length - 1;
   if (label !== 'Adjust Last Operation' && !label.startsWith('Add ')) lastOpHide();
   autosave();
-  markUI('outliner', 'props', 'sidebar', 'fields', 'stats', 'info');
+  markUI('outliner', 'props', 'sidebar', 'fields', 'stats', 'info', 'timeline');
   updateUndoButtons();
 }
 function restoreSnapshot(snap) {
+  exitLocalView();
   const keep = new Set(snap.objs.map(d => d.o));
   for (const o of userObjects()) if (!keep.has(o)) o.removeFromParent();
   for (const d of snap.objs) {
@@ -1368,21 +1446,41 @@ function surfacePoint(lx, ly) {
 const cursor3d = new THREE.Vector3();
 const AXES = { x: new THREE.Vector3(1, 0, 0), y: new THREE.Vector3(0, 1, 0), z: new THREE.Vector3(0, 0, 1) };
 function hasSelectedAncestor(o) { for (let p = o.parent; p && p !== scene; p = p.parent) if (sel.has(p)) return true; return false; }
-function getTargets() {
+function getTargets(withProp = true) {
   scene.updateMatrixWorld();
   if (S.mode === 'edit') {
     const o = edit.obj, mw = o.matrixWorld;
-    return [...edit.sel].map(gi => {
+    const out = [...edit.sel].map(gi => {
       const g = edit.groups[gi], w = g.p.clone().applyMatrix4(mw);
       return { kind: 'vert', gi, local0: g.p.clone(), world0: w, origin: w };
     });
+    if (S.prop.on && withProp && out.length) {
+      const step = Math.max(1, Math.floor(out.length * edit.groups.length / 2e7));
+      edit.groups.forEach((g, gi) => {
+        if (edit.sel.has(gi)) return;
+        const w = g.p.clone().applyMatrix4(mw);
+        let d = Infinity;
+        for (let i = 0; i < out.length; i += step) d = Math.min(d, w.distanceToSquared(out[i].world0));
+        out.push({ kind: 'vert', gi, local0: g.p.clone(), world0: w, origin: w, prop: true, d: Math.sqrt(d) });
+      });
+    }
+    return out;
   }
-  return [...sel].filter(o => isShown(o) && !hasSelectedAncestor(o)).map(o => ({
-    kind: 'obj', o, world0: o.matrixWorld.clone(), parentInv: o.parent.matrixWorld.clone().invert(),
-    p0: o.position.clone(), q0: o.quaternion.clone(), s0: o.scale.clone(), origin: worldPos(o),
-  }));
+  const mk = o => ({ kind: 'obj', o, world0: o.matrixWorld.clone(), parentInv: o.parent.matrixWorld.clone().invert(),
+    p0: o.position.clone(), q0: o.quaternion.clone(), s0: o.scale.clone(), origin: worldPos(o) });
+  const out = [...sel].filter(o => isShown(o) && !hasSelectedAncestor(o)).map(mk);
+  if (S.prop.on && withProp && out.length) {
+    for (const o of userObjects()) {
+      if (sel.has(o) || !selectable(o) || out.some(t => isAncestor(t.o, o) || isAncestor(o, t.o))) continue;
+      const t = mk(o);
+      t.prop = true; t.d = Math.min(...out.map(s => s.origin.distanceTo(t.origin)));
+      out.push(t);
+    }
+  }
+  return out;
 }
 function medianOf(targets) {
+  targets = targets.filter(t => !t.prop);
   const c = new THREE.Vector3();
   targets.forEach(t => c.add(t.origin));
   return targets.length ? c.multiplyScalar(1 / targets.length) : c;
@@ -1390,7 +1488,7 @@ function medianOf(targets) {
 function computePivot(targets) {
   if (S.pivot === 'cursor') return cursor3d.clone();
   if (S.pivot === 'active' && S.mode === 'object' && active && sel.has(active)) return worldPos(active);
-  if (S.pivot === 'bounds' && targets.length) { const b = new THREE.Box3(); targets.forEach(t => b.expandByPoint(t.origin)); return b.getCenter(new THREE.Vector3()); }
+  if (S.pivot === 'bounds' && targets.length) { const b = new THREE.Box3(); targets.filter(t => !t.prop).forEach(t => b.expandByPoint(t.origin)); return b.getCenter(new THREE.Vector3()); }
   return medianOf(targets);
 }
 function orientQuat() {
@@ -1412,10 +1510,19 @@ function applyXform(targets, pivot, { t, q, s, oq }) {
   let inv = null;
   if (S.mode === 'edit') inv = edit.obj.matrixWorld.clone().invert();
   for (const tg of targets) {
-    xformMatrix(individual ? tg.origin : pivot, t, q, s, oq, M);
-    if (tg.kind === 'obj') {
+    xformMatrix(individual && !tg.prop ? tg.origin : pivot, t, q, s, oq, M);
+    if (tg.kind === 'obj' && tg.prop) {
+      const x = 1 - tg.d / S.prop.radius, w = x <= 0 ? 0 : x * x * (3 - 2 * x);
+      const p0 = new THREE.Vector3(), q0 = new THREE.Quaternion(), s0 = new THREE.Vector3(), p1 = new THREE.Vector3(), q1 = new THREE.Quaternion(), s1 = new THREE.Vector3();
+      tg.world0.decompose(p0, q0, s0); W.multiplyMatrices(M, tg.world0).decompose(p1, q1, s1);
+      W.compose(p0.lerp(p1, w), q0.slerp(q1, w), s0.lerp(s1, w)).premultiply(tg.parentInv);
+      W.decompose(tg.o.position, tg.o.quaternion, tg.o.scale);
+    } else if (tg.kind === 'obj') {
       W.multiplyMatrices(M, tg.world0).premultiply(tg.parentInv);
       W.decompose(tg.o.position, tg.o.quaternion, tg.o.scale);
+    } else if (tg.prop) {
+      const x = 1 - tg.d / S.prop.radius, w = x <= 0 ? 0 : x * x * (3 - 2 * x);
+      edit.groups[tg.gi].p.copy(tg.world0).lerp(_v1.copy(tg.world0).applyMatrix4(M), w).applyMatrix4(inv);
     } else {
       edit.groups[tg.gi].p.copy(tg.world0).applyMatrix4(M).applyMatrix4(inv);
     }
@@ -1437,7 +1544,7 @@ let gz = null;
 const TOOL_MODE = { move: 'translate', rotate: 'rotate', scale: 'scale' };
 function syncGizmo() {
   const mode = TOOL_MODE[S.tool];
-  const targets = mode && !modal ? getTargets() : [];
+  const targets = mode && !modal && !xmodal ? getTargets(false) : [];
   if (!targets.length) { if (tc.object) tc.detach(); return; }
   pivotProxy.position.copy(computePivot(targets));
   pivotProxy.quaternion.copy(orientQuat());
@@ -1482,7 +1589,7 @@ function closestOnAxis(p, a, ray) {
   return Math.abs(den) < 1e-8 ? 0 : (B * E - C * D) / den;
 }
 function startModal(type, opts = {}) {
-  if (modal) return;
+  if (modal || xmodal) return;
   closeMenus();
   if (S.mode === 'edit' && !edit.sel.size) { toast('No vertices selected', 'warn'); return; }
   if (S.mode === 'edit') beginGeoEdit();
@@ -1491,7 +1598,7 @@ function startModal(type, opts = {}) {
   const pivot = computePivot(targets), ps = toScreen(pivot, {});
   let sx = mouse.lx, sy = mouse.ly;
   if (sx < 0 || sy < 0 || sx > vpW || sy > vpH) { sx = clamp(ps.x + 80, 0, vpW); sy = clamp(ps.y - 60, 0, vpH); }
-  modal = { type, targets, pivot, ps: { x: ps.x, y: ps.y }, sx, sy, cx: sx, cy: sy, axis: opts.axis || null, plane: false, space: 'global', num: '',
+  modal = { type, targets, pivot, ps: { x: ps.x, y: ps.y }, sx, sy, cx: sx, cy: sy, axis: opts.axisVec ? 'n' : (opts.axis || null), custom: opts.axisVec || null, plane: false, space: 'global', num: '',
     lastAngle: Math.atan2(-(sy - ps.y), sx - ps.x), angleAcc: 0, fromDup: !!opts.fromDup };
   if (tc.object) tc.detach();
   canvas.style.cursor = type === 'grab' ? 'move' : 'crosshair';
@@ -1500,6 +1607,7 @@ function startModal(type, opts = {}) {
 }
 function modalAxisVec() {
   if (!modal.axis) return null;
+  if (modal.axis === 'n') return modal.custom.clone();
   const oq = modal.space === 'local' ? orientQuat() : new THREE.Quaternion();
   return AXES[modal.axis].clone().applyQuaternion(oq);
 }
@@ -1511,7 +1619,7 @@ function updateModal() {
   const num = m.num !== '' ? parseExpr(m.num) : null;
   const hasNum = num !== null && isFinite(num);
   const t = new THREE.Vector3(), q = new THREE.Quaternion(), s = new THREE.Vector3(1, 1, 1);
-  const axisTxt = m.axis ? ` along ${m.space} ${m.plane ? ({ x: 'YZ', y: 'XZ', z: 'XY' })[m.axis] : m.axis.toUpperCase()}` : '';
+  const axisTxt = m.axis === 'n' ? ' along normal' : m.axis ? ` along ${m.space} ${m.plane ? ({ x: 'YZ', y: 'XZ', z: 'XY' })[m.axis] : m.axis.toUpperCase()}` : '';
   let info = '';
   if (m.type === 'grab') {
     if (hasNum) t.copy(av && !m.plane ? av : AXES.x).multiplyScalar(num);
@@ -1547,12 +1655,13 @@ function updateModal() {
     const d0 = Math.hypot(m.sx - m.ps.x, m.sy - m.ps.y), d1 = Math.hypot(m.cx - m.ps.x, m.cy - m.ps.y);
     let f = hasNum ? num : (d0 > 3 ? d1 / d0 : 1 + (m.cx - m.sx) / 100);
     if (snap && !hasNum) f = Math.round(f * 10) / 10;
-    if (!m.axis) s.set(f, f, f);
+    if (!m.axis || m.axis === 'n') s.set(f, f, f);
     else if (m.plane) { s.set(f, f, f); s[m.axis] = 1; }
     else s[m.axis] = f;
     info = `Scale X: <b>${fmt(s.x, 4)}</b> &nbsp;Y: <b>${fmt(s.y, 4)}</b> &nbsp;Z: <b>${fmt(s.z, 4)}</b>${axisTxt}`;
   }
   if (m.num !== '') info += ` &nbsp;<span style="color:#9fc1ff">[${m.num}|]</span>`;
+  if (S.prop.on) info += ` &nbsp;Proportional: <b>${fmt(S.prop.radius, 3)}</b>`;
   applyXform(m.targets, m.pivot, { t, q, s, oq });
   const mh = $('#modalHeader'); mh.innerHTML = info; mh.style.display = 'block';
   requestRender();
@@ -1571,6 +1680,8 @@ function modalKey(e) {
   }
   if (/^[0-9.\-+*/]$/.test(k)) { m.num += k; return updateModal(); }
   if (k === 'Backspace') { m.num = m.num.slice(0, -1); return updateModal(); }
+  if (k === 'PageUp' || k === 'PageDown') { S.prop.radius = clamp(S.prop.radius * (k === 'PageUp' ? 1.15 : 1 / 1.15), 1e-3, 1e4); return updateModal(); }
+  if (lk === 'o') { S.prop.on = !S.prop.on; headerUI(); const ty = m.type, fd = m.fromDup, cv = m.custom; restoreTargets(m.targets); modal = null; startModal(ty, { fromDup: fd, axisVec: cv }); return; }
   if (lk === 'g' && m.type !== 'grab' || lk === 'r' && m.type !== 'rotate' || lk === 's' && m.type !== 'scale') {
     const targets = m.targets; restoreTargets(targets); const fromDup = m.fromDup; modal = null;
     startModal(lk === 'g' ? 'grab' : lk === 'r' ? 'rotate' : 'scale', { fromDup });
@@ -1649,11 +1760,296 @@ function geoStats(g) {
 }
 
 /* =====================================================================
-   Edit Mode (vertex editing)
+   Modifier stack (non-destructive) & welded mesh operations
    ===================================================================== */
-const edit = { obj: null, groups: [], vg: null, sel: new Set(), edges: [], lines: null, changed: false, scr: null, vis: null };
+const geoOf = o => o.userData.data || o.geometry;
+function setGeo(o, g) { o.userData.data = g; evalMods(o, true); }
+const MOD_TYPES = {
+  subsurf: { label: 'Subdivision Surface', icon: 'subdivide', def: { levels: 2, mode: 'catmull' } },
+  mirror: { label: 'Mirror', icon: 'mirror', def: { x: true, y: false, z: false } },
+  array: { label: 'Array', icon: 'array', def: { count: 3, ox: 1.1, oy: 0, oz: 0 } },
+  solidify: { label: 'Solidify', icon: 'solidify', def: { thickness: 0.1, offset: -1 } },
+  smooth: { label: 'Smooth', icon: 'smoothmod', def: { factor: 0.5, repeat: 3 } },
+};
+function evalMods(o, force = false) {
+  const u = o.userData;
+  if (u.kind !== 'mesh') return;
+  if (!u.data) u.data = o.geometry;
+  const mods = (u.mods || []).filter(m => m.show !== false);
+  const key = mods.length ? u.data.uuid + '|' + JSON.stringify(mods) : '';
+  if (!force && key === u._ek && o.geometry && o.geometry === (mods.length ? u._evalGeo : u.data)) return;
+  u._ek = key;
+  const prevEval = u._evalGeo;
+  if (!mods.length) { o.geometry = u.data; u._evalGeo = null; }
+  else {
+    let m = weldGeo(u.data);
+    for (const md of mods) m = applyMod(m, md);
+    o.geometry = u._evalGeo = unweld(m);
+  }
+  if (prevEval && prevEval !== o.geometry) prevEval.dispose();
+  markUI('stats'); requestRender();
+}
+function weldGeo(g) {
+  const pos = g.attributes.position, map = new Map(), P = [], vg = new Int32Array(pos.count);
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i), k = posKey(x, y, z);
+    let gi = map.get(k);
+    if (gi === undefined) { gi = P.length / 3; map.set(k, gi); P.push(x, y, z); }
+    vg[i] = gi;
+  }
+  const T = [];
+  forEachTri(g, (a, b, c) => { const A = vg[a], B = vg[b], C = vg[c]; if (A !== B && B !== C && A !== C) T.push(A, B, C); });
+  return { P, T };
+}
+function reweld({ P, T }) {
+  const map = new Map(), NP = [], remap = new Int32Array(P.length / 3);
+  for (let i = 0; i < P.length / 3; i++) {
+    const k = posKey(P[i * 3], P[i * 3 + 1], P[i * 3 + 2]);
+    let gi = map.get(k);
+    if (gi === undefined) { gi = NP.length / 3; map.set(k, gi); NP.push(P[i * 3], P[i * 3 + 1], P[i * 3 + 2]); }
+    remap[i] = gi;
+  }
+  const NT = [];
+  for (let i = 0; i < T.length; i += 3) { const a = remap[T[i]], b = remap[T[i + 1]], c = remap[T[i + 2]]; if (a !== b && b !== c && a !== c) NT.push(a, b, c); }
+  return { P: NP, T: NT };
+}
+function unweld({ P, T }) {
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
+  g.setIndex(T);
+  g.computeVertexNormals(); g.computeBoundingBox(); g.computeBoundingSphere();
+  const n = g.attributes.normal, uv = new Float32Array(P.length / 3 * 2);
+  for (let i = 0; i < P.length / 3; i++) {
+    const ax = Math.abs(n.getX(i)), ay = Math.abs(n.getY(i)), az = Math.abs(n.getZ(i));
+    const [u, v] = ax >= ay && ax >= az ? [P[i * 3 + 1], P[i * 3 + 2]] : ay >= az ? [P[i * 3], P[i * 3 + 2]] : [P[i * 3], P[i * 3 + 1]];
+    uv[i * 2] = u * 0.5 + 0.5; uv[i * 2 + 1] = v * 0.5 + 0.5;
+  }
+  g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  g.userData.welded = true;
+  return g;
+}
+/* ---- polygon reconstruction (quads from coplanar triangle pairs) & Catmull-Clark ---- */
+function trisToPolys({ P, T }) {
+  const nt = T.length / 3, nv = P.length / 3, emap = new Map(), N = [];
+  const key = (a, b) => a < b ? a * nv + b : b * nv + a;
+  const d2 = (a, b) => (P[a * 3] - P[b * 3]) ** 2 + (P[a * 3 + 1] - P[b * 3 + 1]) ** 2 + (P[a * 3 + 2] - P[b * 3 + 2]) ** 2;
+  for (let t = 0; t < nt; t++) {
+    for (let k = 0; k < 3; k++) { const kk = key(T[t * 3 + k], T[t * 3 + (k + 1) % 3]); let l = emap.get(kk); if (!l) emap.set(kk, l = []); l.push(t); }
+    const a = T[t * 3] * 3, b = T[t * 3 + 1] * 3, c = T[t * 3 + 2] * 3;
+    const ux = P[b] - P[a], uy = P[b + 1] - P[a + 1], uz = P[b + 2] - P[a + 2], vx = P[c] - P[a], vy = P[c + 1] - P[a + 1], vz = P[c + 2] - P[a + 2];
+    const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx, l = Math.hypot(nx, ny, nz) || 1;
+    N.push(nx / l, ny / l, nz / l);
+  }
+  const longestK = t => { let best = 0, bl = -1; for (let k = 0; k < 3; k++) { const l = d2(T[t * 3 + k], T[t * 3 + (k + 1) % 3]); if (l > bl) { bl = l; best = k; } } return best; };
+  const used = new Uint8Array(nt), F = [];
+  for (let t = 0; t < nt; t++) {
+    if (used[t]) continue;
+    const k = longestK(t), tri = [T[t * 3], T[t * 3 + 1], T[t * 3 + 2]];
+    const ex = tri[k], ey = tri[(k + 1) % 3], p = tri[(k + 2) % 3];
+    const pair = (emap.get(key(ex, ey)) || []).find(u => u !== t && !used[u]);
+    let merged = false;
+    if (pair !== undefined && N[t * 3] * N[pair * 3] + N[t * 3 + 1] * N[pair * 3 + 1] + N[t * 3 + 2] * N[pair * 3 + 2] > 0.999) {
+      const t2 = [T[pair * 3], T[pair * 3 + 1], T[pair * 3 + 2]], k2 = longestK(pair);
+      const j = t2.indexOf(ey);
+      if (j >= 0 && t2[(j + 1) % 3] === ex && (k2 === j)) {
+        const q = t2[(j + 2) % 3];
+        F.push([p, ex, q, ey]); used[t] = used[pair] = 1; merged = true;
+      }
+    }
+    if (!merged) { F.push([ex, ey, p]); used[t] = 1; }
+  }
+  return { P, F };
+}
+function catmullClark({ P, F }, simple) {
+  const nv = P.length / 3, nf = F.length, emap = new Map(), edges = [];
+  const key = (a, b) => a < b ? a * nv + b : b * nv + a;
+  const FP = new Float64Array(nf * 3);
+  F.forEach((f, fi) => {
+    for (const v of f) for (let k = 0; k < 3; k++) FP[fi * 3 + k] += P[v * 3 + k] / f.length;
+    for (let i = 0; i < f.length; i++) {
+      const a = f[i], b = f[(i + 1) % f.length], kk = key(a, b);
+      let e = emap.get(kk);
+      if (e === undefined) { e = edges.length; emap.set(kk, e); edges.push({ a, b, f: [] }); }
+      edges[e].f.push(fi);
+    }
+  });
+  const NP = new Array((nv + nf + edges.length) * 3);
+  const fsum = new Float64Array(nv * 3), fcnt = new Int32Array(nv), msum = new Float64Array(nv * 3), ecnt = new Int32Array(nv), bsum = new Float64Array(nv * 3), bcnt = new Int32Array(nv);
+  F.forEach((f, fi) => { for (const v of f) { for (let k = 0; k < 3; k++) fsum[v * 3 + k] += FP[fi * 3 + k]; fcnt[v]++; } });
+  edges.forEach((e, i) => {
+    const j = (nv + nf + i) * 3, inner = e.f.length === 2 && !simple;
+    for (let k = 0; k < 3; k++) {
+      const mid = (P[e.a * 3 + k] + P[e.b * 3 + k]) / 2;
+      NP[j + k] = inner ? (P[e.a * 3 + k] + P[e.b * 3 + k] + FP[e.f[0] * 3 + k] + FP[e.f[1] * 3 + k]) / 4 : mid;
+      msum[e.a * 3 + k] += mid; msum[e.b * 3 + k] += mid;
+      if (e.f.length === 1) { bsum[e.a * 3 + k] += P[e.b * 3 + k]; bsum[e.b * 3 + k] += P[e.a * 3 + k]; }
+    }
+    ecnt[e.a]++; ecnt[e.b]++;
+    if (e.f.length === 1) { bcnt[e.a]++; bcnt[e.b]++; }
+  });
+  for (let v = 0; v < nv; v++) for (let k = 0; k < 3; k++) {
+    const p = P[v * 3 + k];
+    if (simple || !ecnt[v]) NP[v * 3 + k] = p;
+    else if (bcnt[v]) NP[v * 3 + k] = bcnt[v] === 2 ? 0.75 * p + 0.125 * bsum[v * 3 + k] : p;
+    else { const n = ecnt[v]; NP[v * 3 + k] = (fsum[v * 3 + k] / fcnt[v] + 2 * msum[v * 3 + k] / n + (n - 3) * p) / n; }
+  }
+  for (let i = 0; i < nf * 3; i++) NP[nv * 3 + i] = FP[i];
+  const NF = [];
+  F.forEach((f, fi) => {
+    const n = f.length;
+    for (let i = 0; i < n; i++) {
+      const a = f[i], b = f[(i + 1) % n], z = f[(i - 1 + n) % n];
+      NF.push([a, nv + nf + emap.get(key(a, b)), nv + fi, nv + nf + emap.get(key(z, a))]);
+    }
+  });
+  return { P: NP, F: NF };
+}
+function polysToTris({ P, F }) {
+  const T = [];
+  for (const f of F) for (let i = 1; i < f.length - 1; i++) T.push(f[0], f[i], f[i + 1]);
+  return { P, T };
+}
+function meshEdges(T, nv) {
+  const edges = new Map(), list = [], TE = new Int32Array(T.length);
+  const get = (a, b, opp) => {
+    const k = a < b ? a * nv + b : b * nv + a;
+    let e = edges.get(k);
+    if (e === undefined) { e = list.length; edges.set(k, e); list.push({ a: Math.min(a, b), b: Math.max(a, b), o: [], da: a, db: b }); }
+    list[e].o.push(opp);
+    return e;
+  };
+  for (let i = 0; i < T.length; i += 3) {
+    const a = T[i], b = T[i + 1], c = T[i + 2];
+    TE[i] = get(a, b, c); TE[i + 1] = get(b, c, a); TE[i + 2] = get(c, a, b);
+  }
+  return { list, TE };
+}
+function loopSubdivide({ P, T }) {
+  const nv = P.length / 3, { list, TE } = meshEdges(T, nv);
+  const NP = new Array((nv + list.length) * 3).fill(0);
+  const sum = new Float64Array(nv * 3), cnt = new Int32Array(nv), bsum = new Float64Array(nv * 3), bcnt = new Int32Array(nv);
+  for (const { a, b, o } of list) {
+    for (let k = 0; k < 3; k++) { sum[a * 3 + k] += P[b * 3 + k]; sum[b * 3 + k] += P[a * 3 + k]; }
+    cnt[a]++; cnt[b]++;
+    if (o.length === 1) { for (let k = 0; k < 3; k++) { bsum[a * 3 + k] += P[b * 3 + k]; bsum[b * 3 + k] += P[a * 3 + k]; } bcnt[a]++; bcnt[b]++; }
+  }
+  for (let v = 0; v < nv; v++) {
+    for (let k = 0; k < 3; k++) {
+      const p = P[v * 3 + k];
+      if (bcnt[v]) NP[v * 3 + k] = bcnt[v] === 2 ? 0.75 * p + 0.125 * bsum[v * 3 + k] : p;
+      else { const n = cnt[v], beta = n === 3 ? 3 / 16 : 3 / (8 * n); NP[v * 3 + k] = n ? (1 - n * beta) * p + beta * sum[v * 3 + k] : p; }
+    }
+  }
+  list.forEach((e, i) => {
+    const j = (nv + i) * 3;
+    for (let k = 0; k < 3; k++) NP[j + k] = e.o.length === 2
+      ? 0.375 * (P[e.a * 3 + k] + P[e.b * 3 + k]) + 0.125 * (P[e.o[0] * 3 + k] + P[e.o[1] * 3 + k])
+      : 0.5 * (P[e.a * 3 + k] + P[e.b * 3 + k]);
+  });
+  const NT = [];
+  for (let i = 0; i < T.length; i += 3) {
+    const a = T[i], b = T[i + 1], c = T[i + 2], ab = nv + TE[i], bc = nv + TE[i + 1], ca = nv + TE[i + 2];
+    NT.push(a, ab, ca, ab, b, bc, ca, bc, c, ab, bc, ca);
+  }
+  return { P: NP, T: NT };
+}
+function vertexNormals({ P, T }) {
+  const N = new Float64Array(P.length);
+  for (let i = 0; i < T.length; i += 3) {
+    const a = T[i] * 3, b = T[i + 1] * 3, c = T[i + 2] * 3;
+    const ux = P[b] - P[a], uy = P[b + 1] - P[a + 1], uz = P[b + 2] - P[a + 2], vx = P[c] - P[a], vy = P[c + 1] - P[a + 1], vz = P[c + 2] - P[a + 2];
+    const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+    for (const j of [a, b, c]) { N[j] += nx; N[j + 1] += ny; N[j + 2] += nz; }
+  }
+  for (let i = 0; i < N.length; i += 3) { const l = Math.hypot(N[i], N[i + 1], N[i + 2]) || 1; N[i] /= l; N[i + 1] /= l; N[i + 2] /= l; }
+  return N;
+}
+function applyMod(m, md) {
+  if (md.type === 'subsurf') {
+    if (!md.levels) return m;
+    let pm = trisToPolys(m);
+    for (let i = 0; i < md.levels; i++) { if (pm.F.length * 4 > 8e5) break; pm = catmullClark(pm, md.mode === 'simple'); }
+    return polysToTris(pm);
+  }
+  if (md.type === 'mirror') {
+    ['x', 'y', 'z'].forEach((ax, k) => {
+      if (!md[ax]) return;
+      const n = m.P.length / 3, P = m.P.slice(), T = m.T.slice();
+      for (let i = 0; i < n; i++) P.push(...[0, 1, 2].map(j => j === k ? -m.P[i * 3 + j] : m.P[i * 3 + j]));
+      for (let i = 0; i < m.T.length; i += 3) T.push(m.T[i] + n, m.T[i + 2] + n, m.T[i + 1] + n);
+      m = reweld({ P, T });
+    });
+    return m;
+  }
+  if (md.type === 'array') {
+    const n = m.P.length / 3, cnt = Math.max(1, Math.round(md.count)), min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
+    for (let i = 0; i < m.P.length; i++) { min[i % 3] = Math.min(min[i % 3], m.P[i]); max[i % 3] = Math.max(max[i % 3], m.P[i]); }
+    const off = [md.ox * (max[0] - min[0]), md.oy * (max[1] - min[1]), md.oz * (max[2] - min[2])];
+    const P = [], T = [];
+    for (let c = 0; c < cnt; c++) {
+      for (let i = 0; i < m.P.length; i++) P.push(m.P[i] + off[i % 3] * c);
+      for (const t of m.T) T.push(t + n * c);
+    }
+    return { P, T };
+  }
+  if (md.type === 'solidify') {
+    const n = m.P.length / 3, N = vertexNormals(m), t = md.thickness, oa = (md.offset + 1) / 2 * t, ob = (md.offset - 1) / 2 * t;
+    const P = new Array(n * 6), T = [];
+    for (let i = 0; i < n * 3; i++) { P[i] = m.P[i] + N[i] * oa; P[n * 3 + i] = m.P[i] + N[i] * ob; }
+    for (let i = 0; i < m.T.length; i += 3) T.push(m.T[i], m.T[i + 1], m.T[i + 2], m.T[i] + n, m.T[i + 2] + n, m.T[i + 1] + n);
+    const { list } = meshEdges(m.T, n);
+    for (const e of list) if (e.o.length === 1) { const a = e.da, b = e.db; T.push(a, a + n, b, b, a + n, b + n); }
+    return { P, T };
+  }
+  if (md.type === 'smooth') {
+    const n = m.P.length / 3, { list } = meshEdges(m.T, n);
+    let P = m.P.slice();
+    for (let r = 0; r < md.repeat; r++) {
+      const sum = new Float64Array(n * 3), cnt = new Int32Array(n);
+      for (const { a, b } of list) { for (let k = 0; k < 3; k++) { sum[a * 3 + k] += P[b * 3 + k]; sum[b * 3 + k] += P[a * 3 + k]; } cnt[a]++; cnt[b]++; }
+      const NP = P.slice();
+      for (let v = 0; v < n; v++) if (cnt[v]) for (let k = 0; k < 3; k++) NP[v * 3 + k] = P[v * 3 + k] + md.factor * (sum[v * 3 + k] / cnt[v] - P[v * 3 + k]);
+      P = NP;
+    }
+    return { P, T: m.T };
+  }
+  return m;
+}
+function addModifier(o, type, extra = {}) {
+  const u = o.userData;
+  if (u.kind !== 'mesh') return null;
+  const md = { type, show: true, ...JSON.parse(JSON.stringify(MOD_TYPES[type].def)), ...extra };
+  u.mods.push(md);
+  evalMods(o, true);
+  return md;
+}
+function applyModifier(o, i) {
+  const u = o.userData, md = u.mods[i];
+  const g = unweld(applyMod(weldGeo(u.data), md));
+  u.mods.splice(i, 1);
+  u.params = null; u.prim = 'custom';
+  setGeo(o, g);
+  pushHistory('Apply ' + MOD_TYPES[md.type].label);
+  markUI('props');
+}
+function setSubsurfLevel(level) {
+  const list = S.mode === 'edit' ? [edit.obj] : selectedList().filter(o => o.userData.kind === 'mesh');
+  if (!list.length) { toast('Select a mesh object', 'warn'); return; }
+  for (const o of list) {
+    const md = o.userData.mods.find(m => m.type === 'subsurf');
+    if (md) { md.levels = level; evalMods(o, true); } else addModifier(o, 'subsurf', { levels: level });
+  }
+  pushHistory('Subdivision Set'); markUI('props');
+  toast(`Subdivision Surface level ${level}`);
+}
+
+/* =====================================================================
+   Edit Mode (vertex / edge / face)
+   ===================================================================== */
+const edit = { obj: null, groups: [], vg: null, sel: new Set(), edges: [], tris: [], triFace: null, faces: [], lines: null, faceHL: null,
+  changed: false, scr: null, vis: null, selMode: 'vert' };
 function setPolyOffset(o, on) {
-  for (const m of [o.userData.mat, o.userData.solidMat]) if (m && m.polygonOffset !== on) {
+  for (const m of [o.userData.mat, o.userData.solidMat, ...Object.values(wireMats)]) if (m && m.polygonOffset !== on) {
     m.polygonOffset = on; m.polygonOffsetFactor = on ? 1 : 0; m.polygonOffsetUnits = on ? 1 : 0; m.needsUpdate = true;
   }
 }
@@ -1661,7 +2057,7 @@ function enterEdit() {
   if (S.mode === 'edit') return;
   const o = active;
   if (!o || o.userData.kind !== 'mesh' || !sel.has(o) || !isShown(o)) { toast('Select a visible mesh object to enter Edit Mode', 'warn'); return; }
-  const n = o.geometry.attributes.position?.count || 0;
+  const n = geoOf(o).attributes.position?.count || 0;
   if (!n) { toast('Mesh has no geometry', 'warn'); return; }
   if (n > 500000) { toast('Mesh too dense for Edit Mode', 'err'); return; }
   S.mode = 'edit'; edit.obj = o; edit.changed = false; edit.sel.clear();
@@ -1672,24 +2068,27 @@ function enterEdit() {
   setSel([o], o);
   modeUI();
 }
+function removeEditVisuals() {
+  for (const k of ['lines', 'faceHL']) if (edit[k]) { edit[k].removeFromParent(); edit[k].geometry.dispose(); edit[k] = null; }
+}
 function exitEdit(push = true) {
   if (S.mode !== 'edit') return;
   const o = edit.obj;
-  if (o) setPolyOffset(o, false);
-  if (edit.lines) { edit.lines.removeFromParent(); edit.lines.geometry.dispose(); edit.lines = null; }
+  if (o) { setPolyOffset(o, false); evalMods(o, true); }
+  removeEditVisuals();
   S.mode = 'object';
   const changed = edit.changed;
-  edit.obj = null; edit.sel.clear(); edit.groups = []; edit.edges = [];
+  edit.obj = null; edit.sel.clear(); edit.groups = []; edit.edges = []; edit.tris = []; edit.faces = [];
   if (push && changed) pushHistory('Toggle Edit Mode');
   updateSelectionVisuals();
   modeUI();
 }
 function toggleEdit() { S.mode === 'edit' ? exitEdit() : enterEdit(); }
 function buildEditData() {
-  const o = edit.obj, g = o.geometry, pos = g.attributes.position;
+  const o = edit.obj, g = geoOf(o), pos = g.attributes.position, welded = !!g.userData.welded;
   const map = new Map(), groups = [], vg = new Int32Array(pos.count);
   for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i), key = posKey(x, y, z);
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i), key = welded ? i : posKey(x, y, z);
     let gi = map.get(key);
     if (gi === undefined) { gi = groups.length; map.set(key, gi); groups.push({ p: new THREE.Vector3(x, y, z), idx: [], n: new THREE.Vector3() }); }
     groups[gi].idx.push(i); vg[i] = gi;
@@ -1714,65 +2113,105 @@ function buildEditData() {
   groups.forEach(gr => gr.n.normalize());
   const len = (a, b) => groups[a].p.distanceToSquared(groups[b].p);
   const longest = (e, ti) => { const [A, B, C] = tris[ti], l = len(e.a, e.b); return l >= len(A, B) * 0.999 && l >= len(B, C) * 0.999 && l >= len(C, A) * 0.999; };
+  // union-find: triangles joined across hidden (quad-diagonal) edges form one polygon face
+  const parent = new Int32Array(tris.length).map((_, i) => i);
+  const find = i => { while (parent[i] !== i) i = parent[i] = parent[parent[i]]; return i; };
   edit.edges = [];
   for (const e of emap.values()) {
-    if (e.t.length === 2 && fns[e.t[0]].dot(fns[e.t[1]]) > 0.9999 && longest(e, e.t[0]) && longest(e, e.t[1])) continue;
+    if (e.t.length === 2 && fns[e.t[0]].dot(fns[e.t[1]]) > 0.9999 && longest(e, e.t[0]) && longest(e, e.t[1])) { parent[find(e.t[0])] = find(e.t[1]); continue; }
     edit.edges.push(e.a, e.b);
   }
-  edit.groups = groups; edit.vg = vg;
+  const fmap = new Map(), faces = [], triFace = new Int32Array(tris.length);
+  tris.forEach((t, i) => {
+    const r = find(i);
+    let f = fmap.get(r);
+    if (f === undefined) { f = faces.length; fmap.set(r, f); faces.push({ tris: [], verts: new Set(), c: new THREE.Vector3(), n: new THREE.Vector3() }); }
+    faces[f].tris.push(i); t.forEach(v => faces[f].verts.add(v)); faces[f].n.add(fns[i]); triFace[i] = f;
+  });
+  for (const f of faces) { f.verts.forEach(v => f.c.add(groups[v].p)); f.c.multiplyScalar(1 / f.verts.size); f.n.normalize(); }
+  edit.groups = groups; edit.vg = vg; edit.tris = tris; edit.faces = faces; edit.triFace = triFace;
+  buildTopology();
   for (const i of [...edit.sel]) if (i >= groups.length) edit.sel.delete(i);
   edit.scr = new Float32Array(groups.length * 2); edit.vis = new Uint8Array(groups.length);
-  if (edit.lines) { edit.lines.removeFromParent(); edit.lines.geometry.dispose(); }
+  removeEditVisuals();
   const lg = new THREE.BufferGeometry();
   lg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(edit.edges.length * 3), 3));
   lg.setAttribute('color', new THREE.BufferAttribute(new Float32Array(edit.edges.length * 3), 3));
   edit.lines = new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ vertexColors: true, depthTest: !S.xray }));
   edit.lines.raycast = () => {}; edit.lines.name = '__editLines'; edit.lines.renderOrder = 2;
-  o.add(edit.lines);
+  edit.faceHL = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: COL.sel, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide }));
+  edit.faceHL.raycast = () => {}; edit.faceHL.name = '__faceHL'; edit.faceHL.renderOrder = 1;
+  o.add(edit.lines, edit.faceHL);
   writeLinePositions(); updateEditColors();
+}
+const faceSelected = f => { for (const v of f.verts) if (!edit.sel.has(v)) return false; return true; };
+function updateFaceHighlight() {
+  if (!edit.faceHL) return;
+  const pts = [];
+  for (const f of edit.faces) if (faceSelected(f)) for (const ti of f.tris) for (const v of edit.tris[ti]) { const p = edit.groups[v].p; pts.push(p.x, p.y, p.z); }
+  const g = edit.faceHL.geometry;
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+  g.computeBoundingSphere();
+  edit.faceHL.visible = pts.length > 0;
 }
 function writeLinePositions() {
   const a = edit.lines.geometry.attributes.position, E = edit.edges;
   for (let i = 0; i < E.length; i++) { const p = edit.groups[E[i]].p; a.setXYZ(i, p.x, p.y, p.z); }
   a.needsUpdate = true;
   edit.lines.geometry.computeBoundingSphere();
+  updateFaceHighlight();
 }
 function updateEditColors() {
   if (!edit.lines) return;
   const c = edit.lines.geometry.attributes.color, E = edit.edges;
-  const on = new THREE.Color(COL.sel), off = new THREE.Color(0x070707);
-  for (let i = 0; i < E.length; i++) { const col = edit.sel.has(E[i]) ? on : off; c.setXYZ(i, col.r, col.g, col.b); }
+  const on = new THREE.Color(COL.sel), off = new THREE.Color(0x070707), vm = edit.selMode === 'vert';
+  for (let i = 0; i < E.length; i += 2) {
+    const sa = edit.sel.has(E[i]), sb = edit.sel.has(E[i + 1]);
+    const ca = vm ? (sa ? on : off) : (sa && sb ? on : off), cb = vm ? (sb ? on : off) : ca;
+    c.setXYZ(i, ca.r, ca.g, ca.b); c.setXYZ(i + 1, cb.r, cb.g, cb.b);
+  }
   c.needsUpdate = true;
+  updateFaceHighlight();
   markUI('stats', 'sidebar', 'fields');
+  requestRender();
+}
+function setSelectMode(mode) {
+  if (S.mode !== 'edit') { $$('#selModeSeg button').forEach(b => b.classList.toggle('on', b.dataset.selmode === mode)); edit.selMode = mode; return; }
+  const prev = edit.selMode;
+  edit.selMode = mode;
+  if (mode === 'face' && prev !== 'face') { const s = new Set(); for (const f of edit.faces) if (faceSelected(f)) f.verts.forEach(v => s.add(v)); edit.sel = s; }
+  else if (mode === 'edge' && prev === 'vert') { const s = new Set(), E = edit.edges; for (let i = 0; i < E.length; i += 2) if (edit.sel.has(E[i]) && edit.sel.has(E[i + 1])) { s.add(E[i]); s.add(E[i + 1]); } edit.sel = s; }
+  $$('#selModeSeg button').forEach(b => b.classList.toggle('on', b.dataset.selmode === mode));
+  updateEditColors();
+  markUI('hints');
 }
 function writeEditPositions(full) {
-  const o = edit.obj, g = o.geometry, pos = g.attributes.position;
+  const o = edit.obj, g = geoOf(o), pos = g.attributes.position;
   for (const gr of edit.groups) for (const i of gr.idx) pos.setXYZ(i, gr.p.x, gr.p.y, gr.p.z);
   pos.needsUpdate = true;
-  if (full || pos.count < 60000) {
-    if (o.userData.smooth) smoothNormals(g); else g.computeVertexNormals();
-  }
+  if (full || pos.count < 60000) { if (o.userData.smooth) smoothNormals(g); else g.computeVertexNormals(); }
   g.computeBoundingBox(); g.computeBoundingSphere();
+  if (o.userData.mods.some(m => m.show !== false) && (full || pos.count < 4000)) evalMods(o, true);
   writeLinePositions();
   requestRender();
 }
 function beginGeoEdit() {
-  const o = edit.obj;
-  o.geometry = o.geometry.clone();
-  o.userData.params = null; o.userData.prim = 'custom';
+  const o = edit.obj, u = o.userData;
+  u.data = geoOf(o).clone();
+  if (!u.mods.some(m => m.show !== false)) o.geometry = u.data;
+  u.params = null; u.prim = 'custom';
   edit.changed = true;
 }
 function finishGeoEdit() {
   writeEditPositions(true);
-  const o = edit.obj;
-  edit.groups.forEach(gr => gr.n.set(0, 0, 0));
-  const ab = new THREE.Vector3(), ac = new THREE.Vector3(), vg = edit.vg, G = edit.groups;
-  forEachTri(o.geometry, (a, b, c) => {
-    const A = vg[a], B = vg[b], C = vg[c];
+  const G = edit.groups, ab = new THREE.Vector3(), ac = new THREE.Vector3();
+  G.forEach(gr => gr.n.set(0, 0, 0));
+  for (const [A, B, C] of edit.tris) {
     ab.subVectors(G[B].p, G[A].p); ac.subVectors(G[C].p, G[A].p);
     const fn = ab.cross(ac); G[A].n.add(fn); G[B].n.add(fn); G[C].n.add(fn);
-  });
+  }
   G.forEach(gr => gr.n.normalize());
+  for (const f of edit.faces) { f.c.set(0, 0, 0); f.verts.forEach(v => f.c.add(G[v].p)); f.c.multiplyScalar(1 / f.verts.size); }
   markUI('stats', 'fields', 'sidebar');
 }
 function projectGroups() {
@@ -1808,51 +2247,92 @@ function editPick(lx, ly) {
   }
   return best;
 }
+function segDist(px, py, ax, ay, bx, by) {
+  const dx = bx - ax, dy = by - ay, l = dx * dx + dy * dy, t = l ? clamp(((px - ax) * dx + (py - ay) * dy) / l, 0, 1) : 0;
+  return Math.hypot(px - ax - t * dx, py - ay - t * dy);
+}
+function editPickEdge(lx, ly) {
+  projectGroups();
+  const E = edit.edges, s = edit.scr;
+  let best = -1, bd = 12;
+  for (let i = 0; i < E.length; i += 2) {
+    const a = E[i], b = E[i + 1];
+    if (!edit.vis[a] || !edit.vis[b]) continue;
+    const d = segDist(lx, ly, s[a * 2], s[a * 2 + 1], s[b * 2], s[b * 2 + 1]);
+    if (d < bd) { bd = d; best = i; }
+  }
+  return best < 0 ? null : [E[best], E[best + 1]];
+}
+function editPickFace(lx, ly) {
+  const o = edit.obj;
+  o.updateMatrixWorld();
+  setRay(lx, ly);
+  const ray = raycaster.ray.clone().applyMatrix4(o.matrixWorld.clone().invert()), hit = new THREE.Vector3();
+  let best = -1, bd = Infinity;
+  edit.tris.forEach(([A, B, C], i) => {
+    if (ray.intersectTriangle(edit.groups[A].p, edit.groups[B].p, edit.groups[C].p, false, hit)) {
+      const d = hit.distanceToSquared(ray.origin);
+      if (d < bd) { bd = d; best = i; }
+    }
+  });
+  return best < 0 ? null : edit.faces[edit.triFace[best]];
+}
 function editSelectAll(action = 'select') {
   const n = edit.groups.length;
   if (action === 'toggle') action = edit.sel.size === n ? 'deselect' : 'select';
   if (action === 'select') for (let i = 0; i < n; i++) edit.sel.add(i);
   else if (action === 'deselect') edit.sel.clear();
+  else if (edit.selMode === 'face') { const s = new Set(); for (const f of edit.faces) if (!faceSelected(f)) f.verts.forEach(v => s.add(v)); edit.sel = s; }
   else { const s = new Set(); for (let i = 0; i < n; i++) if (!edit.sel.has(i)) s.add(i); edit.sel = s; }
   updateEditColors();
 }
 function editSelectLinked() {
   const adj = new Map(), E = edit.edges;
-  for (let i = 0; i < E.length; i += 2) {
-    (adj.get(E[i]) || adj.set(E[i], []).get(E[i])).push(E[i + 1]);
-    (adj.get(E[i + 1]) || adj.set(E[i + 1], []).get(E[i + 1])).push(E[i]);
-  }
+  const add = (a, b) => { let l = adj.get(a); if (!l) adj.set(a, l = []); l.push(b); };
+  for (const [A, B, C] of edit.tris) { add(A, B); add(B, A); add(B, C); add(C, B); add(A, C); add(C, A); }
+  for (let i = 0; i < E.length; i += 2) { add(E[i], E[i + 1]); add(E[i + 1], E[i]); }
   const stack = [...edit.sel];
   while (stack.length) { const v = stack.pop(); for (const n of adj.get(v) || []) if (!edit.sel.has(n)) { edit.sel.add(n); stack.push(n); } }
   updateEditColors();
 }
-function editReplaceGeometry(g) {
+function selectedKeys() { const s = new Set(); edit.sel.forEach(i => { const p = edit.groups[i].p; s.add(posKey(p.x, p.y, p.z)); }); return s; }
+function editReplaceGeometry(g, keys = null, label = 'Edit Mesh', push = true) {
   const o = edit.obj;
   if (o.userData.smooth) smoothNormals(g); else g.computeVertexNormals();
-  o.geometry = g;
+  g.computeBoundingBox(); g.computeBoundingSphere();
   o.userData.params = null; o.userData.prim = 'custom';
+  setGeo(o, g);
   edit.changed = true; edit.sel.clear();
   buildEditData();
-  pushHistory('Edit Mesh');
+  if (keys?.idx) keys.idx.forEach(i => { if (i < edit.groups.length) edit.sel.add(i); });
+  else if (keys) edit.groups.forEach((gr, i) => { if (keys.has(posKey(gr.p.x, gr.p.y, gr.p.z))) edit.sel.add(i); });
+  updateEditColors();
+  if (push) pushHistory(label);
+}
+function weldFromEdit() {
+  const P = [];
+  for (const gr of edit.groups) P.push(gr.p.x, gr.p.y, gr.p.z);
+  return { P, T: edit.tris.flat() };
 }
 function editDelete() {
   if (!edit.sel.size) return;
-  const vg = edit.vg, s = edit.sel;
-  const g = rebuildFromTris(edit.obj.geometry, (a, b, c) => !s.has(vg[a]) && !s.has(vg[b]) && !s.has(vg[c]));
-  editReplaceGeometry(g);
-  toast('Deleted vertices');
+  const s = edit.sel, faceMode = edit.selMode === 'face';
+  const m = weldFromEdit(), T = [];
+  for (let i = 0; i < m.T.length; i += 3) {
+    const a = m.T[i], b = m.T[i + 1], c = m.T[i + 2];
+    const kill = faceMode ? faceSelected(edit.faces[edit.triFace[i / 3]]) : (s.has(a) || s.has(b) || s.has(c));
+    if (!kill) T.push(a, b, c);
+  }
+  editReplaceGeometry(unweld(cleanMesh({ P: m.P, T })), null, faceMode ? 'Delete Faces' : 'Delete Vertices');
+  toast(faceMode ? 'Deleted faces' : 'Deleted vertices');
 }
 function editMerge() {
   if (edit.sel.size < 2) { toast('Select at least two vertices', 'warn'); return; }
-  beginGeoEdit();
   const c = new THREE.Vector3();
   edit.sel.forEach(i => c.add(edit.groups[i].p)); c.multiplyScalar(1 / edit.sel.size);
   edit.sel.forEach(i => edit.groups[i].p.copy(c));
-  writeEditPositions(true);
-  const pos = edit.obj.geometry.attributes.position, key = i => posKey(pos.getX(i), pos.getY(i), pos.getZ(i));
-  const g = rebuildFromTris(edit.obj.geometry, (a, b, cc) => { const A = key(a), B = key(b), C = key(cc); return A !== B && B !== C && A !== C; });
   const n = edit.sel.size;
-  editReplaceGeometry(g);
+  editReplaceGeometry(unweld(cleanMesh(weldFromEdit())), new Set([posKey(c.x, c.y, c.z)]), 'Merge');
   toast(`Merged ${n} vertices`);
 }
 function editRandomize(amount = 0.1) {
@@ -1861,15 +2341,452 @@ function editRandomize(amount = 0.1) {
   edit.sel.forEach(i => edit.groups[i].p.add(new THREE.Vector3(Math.random() - .5, Math.random() - .5, Math.random() - .5).multiplyScalar(amount * 2)));
   finishGeoEdit(); pushHistory('Randomize');
 }
+/* ---- Subdivide (selected faces, with smoothness & cut count) ---- */
+function subdivideCore(m, selSet, cuts, smooth, normals) {
+  let { P, T } = m, sel = new Set(selSet), N = normals.slice();
+  for (let it = 0; it < cuts; it++) {
+    const nv = P.length / 3, split = new Map(), key = (a, b) => a < b ? a * nv + b : b * nv + a;
+    for (let i = 0; i < T.length; i += 3) {
+      const t = [T[i], T[i + 1], T[i + 2]];
+      if (!t.every(v => sel.has(v))) continue;
+      for (let k = 0; k < 3; k++) { const a = t[k], b = t[(k + 1) % 3]; if (!split.has(key(a, b))) split.set(key(a, b), -1); }
+    }
+    if (!split.size) break;
+    const NP = P.slice(), NN = N.slice();
+    const mid = (a, b) => {
+      const k = key(a, b);
+      let id = split.get(k);
+      if (id === undefined) return -1;
+      if (id >= 0) return id;
+      id = NP.length / 3;
+      const A = new THREE.Vector3().fromArray(P, a * 3), B = new THREE.Vector3().fromArray(P, b * 3);
+      const na = new THREE.Vector3().fromArray(N, a * 3), nb = new THREE.Vector3().fromArray(N, b * 3);
+      const pm = A.clone().add(B).multiplyScalar(0.5);
+      if (smooth > 0) {
+        const d = B.clone().sub(A), L = d.length();
+        const ta = d.clone().addScaledVector(na, -d.dot(na)).setLength(L), tb = d.clone().addScaledVector(nb, -d.dot(nb)).setLength(L);
+        pm.addScaledVector(ta.sub(tb), smooth / 8);
+      }
+      const nm = na.clone().add(nb).normalize();
+      NP.push(pm.x, pm.y, pm.z); NN.push(nm.x, nm.y, nm.z);
+      split.set(k, id); sel.add(id);
+      return id;
+    };
+    const NT = [];
+    for (let i = 0; i < T.length; i += 3) {
+      const v = [T[i], T[i + 1], T[i + 2]], m3 = [mid(v[0], v[1]), mid(v[1], v[2]), mid(v[2], v[0])];
+      const cnt = m3.filter(x => x >= 0).length;
+      if (cnt === 0) { NT.push(...v); continue; }
+      if (cnt === 3) { const [ab, bc, ca] = m3; NT.push(v[0], ab, ca, ab, v[1], bc, ca, bc, v[2], ab, bc, ca); continue; }
+      if (cnt === 1) { const k = m3.findIndex(x => x >= 0), a = v[k], b = v[(k + 1) % 3], c = v[(k + 2) % 3], ab = m3[k]; NT.push(a, ab, c, ab, b, c); continue; }
+      const k = m3.findIndex(x => x < 0), r = (k + 1) % 3;
+      const a = v[r], b = v[(r + 1) % 3], c = v[(r + 2) % 3], ab = m3[r], bc = m3[(r + 1) % 3];
+      NT.push(ab, b, bc, a, ab, bc, a, bc, c);
+    }
+    P = NP; T = NT; N = NN;
+  }
+  return { m: { P, T }, sel };
+}
+let subdivState = null;
+function editSubdivide(cuts = 1, smooth = 0) {
+  if (S.mode !== 'edit') return;
+  const faces = edit.faces.filter(faceSelected);
+  if (!faces.length) { toast('Select faces to subdivide', 'warn'); return; }
+  subdivState = { pre: geoOf(edit.obj), keys: selectedKeys(), cuts, smooth };
+  runSubdivide(true);
+  lastOpPanel('Subdivide', () => [
+    field('Number of Cuts', numField({ get: () => subdivState.cuts, set: v => { subdivState.cuts = v; runSubdivide(false); }, int: true, min: 1, max: 6, commit: null })),
+    field('Smoothness', numField({ get: () => subdivState.smooth, set: v => { subdivState.smooth = v; runSubdivide(false); }, min: 0, max: 1, slider: true, commit: null })),
+  ]);
+}
+function runSubdivide(push) {
+  const st = subdivState, o = edit.obj;
+  if (!o) return;
+  if (!push) { o.userData.data = st.pre; edit.sel.clear(); buildEditData(); edit.groups.forEach((gr, i) => { if (st.keys.has(posKey(gr.p.x, gr.p.y, gr.p.z))) edit.sel.add(i); }); }
+  const N = [];
+  for (const gr of edit.groups) N.push(gr.n.x, gr.n.y, gr.n.z);
+  const { m, sel: ns } = subdivideCore(weldFromEdit(), edit.sel, st.cuts, st.smooth, N);
+  const keys = new Set([...ns].map(i => posKey(m.P[i * 3], m.P[i * 3 + 1], m.P[i * 3 + 2])));
+  editReplaceGeometry(unweld(m), keys, 'Subdivide', push);
+  if (!push) hist.stack[hist.index] = snapshot('Subdivide');
+}
+/* ---- Extrude region ---- */
+function editExtrude() {
+  if (S.mode !== 'edit') return;
+  const F = [];
+  edit.tris.forEach((t, i) => { if (t.every(v => edit.sel.has(v))) F.push(i); });
+  if (!F.length) { toast('Select faces to extrude', 'warn'); return; }
+  const m = weldFromEdit(), P = m.P.slice(), T = m.T.slice(), nv = P.length / 3;
+  const ecount = new Map(), edir = new Map(), key = (a, b) => a < b ? a * nv + b : b * nv + a;
+  const normal = new THREE.Vector3();
+  for (const f of F) {
+    const t = edit.tris[f];
+    const A = edit.groups[t[0]].p, B = edit.groups[t[1]].p, C = edit.groups[t[2]].p;
+    normal.add(B.clone().sub(A).cross(C.clone().sub(A)));
+    for (let k = 0; k < 3; k++) { const a = t[k], b = t[(k + 1) % 3], kk = key(a, b); ecount.set(kk, (ecount.get(kk) || 0) + 1); edir.set(kk, [a, b]); }
+  }
+  normal.normalize();
+  const eps = 0, dup = new Map();
+  const nvOf = v => { let n = dup.get(v); if (n === undefined) { n = P.length / 3; dup.set(v, n); P.push(P[v * 3] + normal.x * eps, P[v * 3 + 1] + normal.y * eps, P[v * 3 + 2] + normal.z * eps); } return n; };
+  for (const f of F) for (let k = 0; k < 3; k++) T[f * 3 + k] = nvOf(T[f * 3 + k]);
+  for (const [kk, c] of ecount) if (c === 1) { const [a, b] = edir.get(kk), a2 = nvOf(a), b2 = nvOf(b); T.push(a, b, b2, a, b2, a2); }
+  editReplaceGeometry(unweld({ P, T }), { idx: new Set(dup.values()) }, 'Extrude Region');
+  edit.obj.updateMatrixWorld();
+  const wn = normal.clone().transformDirection(edit.obj.matrixWorld);
+  startModal('grab', { axisVec: wn });
+}
+/* ---- Fill: make a face from 3-4 selected vertices ---- */
+function editFill() {
+  if (S.mode !== 'edit') return;
+  const ids = [...edit.sel];
+  if (ids.length < 3 || ids.length > 32) { toast('Select 3 or more vertices to fill', 'warn'); return; }
+  const pts = ids.map(i => edit.groups[i].p), c = new THREE.Vector3();
+  pts.forEach(p => c.add(p)); c.multiplyScalar(1 / pts.length);
+  const n = new THREE.Vector3();
+  for (let i = 0; i < pts.length; i++) n.add(pts[i].clone().sub(c).cross(pts[(i + 1) % pts.length].clone().sub(c)));
+  if (n.lengthSq() < 1e-12) n.copy(pts[1].clone().sub(pts[0]).cross(pts[2].clone().sub(pts[0])));
+  n.normalize();
+  const u = new THREE.Vector3().subVectors(pts[0], c).normalize(), v = n.clone().cross(u);
+  const order = ids.map((id, i) => ({ id, a: Math.atan2(pts[i].clone().sub(c).dot(v), pts[i].clone().sub(c).dot(u)) })).sort((x, y) => x.a - y.a).map(x => x.id);
+  const avgN = new THREE.Vector3(); ids.forEach(i => avgN.add(edit.groups[i].n));
+  if (avgN.lengthSq() > 1e-8 && avgN.dot(n) < 0) order.reverse();
+  const m = weldFromEdit();
+  for (let i = 1; i < order.length - 1; i++) m.T.push(order[0], order[i], order[i + 1]);
+  editReplaceGeometry(unweld(m), selectedKeys(), 'Fill');
+}
 function flipNormals(o) {
-  const g = o.geometry.clone();
+  const g = geoOf(o).clone();
   if (!g.index) g.setIndex([...Array(g.attributes.position.count).keys()]);
   const idx = g.index.array.slice();
   for (let i = 0; i + 2 < idx.length; i += 3) { const t = idx[i + 1]; idx[i + 1] = idx[i + 2]; idx[i + 2] = t; }
   g.setIndex(Array.from(idx));
   const n = g.attributes.normal;
   if (n) { for (let i = 0; i < n.count; i++) n.setXYZ(i, -n.getX(i), -n.getY(i), -n.getZ(i)); n.needsUpdate = true; }
-  o.geometry = g; o.userData.params = null; o.userData.prim = 'custom';
+  o.userData.params = null; o.userData.prim = 'custom';
+  setGeo(o, g);
+}
+/* =====================================================================
+   Edit Mode tools II: loops, rings, loop cut, inset, separate…
+   ===================================================================== */
+const ekey = (a, b) => a < b ? a * 4194304 + b : b * 4194304 + a;
+function computeFaceLoop(f) {
+  const dir = new Map();
+  for (const ti of f.tris) {
+    const t = edit.tris[ti];
+    for (let k = 0; k < 3; k++) {
+      const a = t[k], b = t[(k + 1) % 3], rk = b + ',' + a;
+      if (dir.has(rk)) dir.delete(rk); else dir.set(a + ',' + b, [a, b]);
+    }
+  }
+  const next = new Map();
+  for (const [a, b] of dir.values()) { if (next.has(a)) return null; next.set(a, b); }
+  if (!next.size) return null;
+  const start = next.keys().next().value, loop = [start];
+  let v = next.get(start);
+  while (v !== start) { if (v === undefined || loop.length > next.size) return null; loop.push(v); v = next.get(v); }
+  return loop.length === next.size ? loop : null;
+}
+function buildTopology() {
+  edit.edgeFaces = new Map(); edit.vAdj = new Map();
+  edit.faces.forEach((f, fi) => {
+    f.loop = computeFaceLoop(f);
+    if (!f.loop) return;
+    for (let i = 0; i < f.loop.length; i++) {
+      const k = ekey(f.loop[i], f.loop[(i + 1) % f.loop.length]);
+      let l = edit.edgeFaces.get(k); if (!l) edit.edgeFaces.set(k, l = []); l.push(fi);
+    }
+  });
+  const E = edit.edges;
+  for (let i = 0; i < E.length; i += 2) {
+    for (const [a, b] of [[E[i], E[i + 1]], [E[i + 1], E[i]]]) { let l = edit.vAdj.get(a); if (!l) edit.vAdj.set(a, l = []); l.push(b); }
+  }
+}
+const facesOfEdge = (a, b) => edit.edgeFaces.get(ekey(a, b)) || [];
+function quadOpp(f, x, y) {
+  const L = f.loop;
+  if (!L || L.length !== 4 || f.verts.size !== 4) return null;
+  for (let i = 0; i < 4; i++) {
+    const a = L[i], b = L[(i + 1) % 4];
+    if (a === x && b === y) return { fwd: true, x2: L[(i + 3) % 4], y2: L[(i + 2) % 4] };
+    if (a === y && b === x) return { fwd: false, x2: L[(i + 2) % 4], y2: L[(i + 3) % 4] };
+  }
+  return null;
+}
+function edgeRing(a, b) {
+  const cuts = [], seen = new Set(), ends = new Map();
+  for (const f0 of facesOfEdge(a, b)) {
+    let x = a, y = b, fi = f0;
+    while (fi !== undefined && !seen.has(fi)) {
+      const o = quadOpp(edit.faces[fi], x, y);
+      if (!o) { if (edit.faces[fi].loop) ends.set(fi, { fi, x, y }); break; }
+      seen.add(fi); cuts.push({ fi, x, y, x2: o.x2, y2: o.y2, fwd: o.fwd });
+      x = o.x2; y = o.y2;
+      fi = facesOfEdge(x, y).find(g => !seen.has(g));
+    }
+  }
+  return { cuts, ends: [...ends.values()].filter(e => !seen.has(e.fi)) };
+}
+function cleanMesh({ P, T }) {
+  const m = reweld({ P, T }), used = new Int32Array(m.P.length / 3).fill(-1), NP = [];
+  for (const v of m.T) if (used[v] < 0) { used[v] = NP.length / 3; NP.push(m.P[v * 3], m.P[v * 3 + 1], m.P[v * 3 + 2]); }
+  return { P: NP, T: m.T.map(v => used[v]) };
+}
+function keepTrisExcept(skip) {
+  const T = [];
+  edit.faces.forEach((f, fi) => { if (!skip.has(fi)) for (const ti of f.tris) T.push(...edit.tris[ti]); });
+  return T;
+}
+/* ---- re-runnable edit operator (powers the Adjust Last Operation panel) ---- */
+let lastEdit = null;
+function editOp(label, params, run, fields) {
+  lastEdit = { label, params, run, pre: geoOf(edit.obj), keys: selectedKeys() };
+  if (!execEditOp(true)) { lastEdit = null; return false; }
+  if (fields) lastOpPanel(label, () => fields(params, () => execEditOp(false)));
+  return true;
+}
+function execEditOp(push) {
+  const st = lastEdit, o = edit.obj;
+  if (!st || !o) return false;
+  if (!push) {
+    o.userData.data = st.pre; edit.sel.clear(); buildEditData();
+    edit.groups.forEach((gr, i) => { if (st.keys.has(posKey(gr.p.x, gr.p.y, gr.p.z))) edit.sel.add(i); });
+  }
+  const r = st.run(st.params);
+  if (!r) return false;
+  editReplaceGeometry(r.geo, r.sel, st.label, push);
+  if (!push) hist.stack[hist.index] = snapshot(st.label);
+  return true;
+}
+const groupByKey = k => edit.groups.findIndex(g => posKey(g.p.x, g.p.y, g.p.z) === k);
+/* ---- loop cut ---- */
+function loopCutGeometry(a, b, n) {
+  const { cuts, ends } = edgeRing(a, b);
+  if (!cuts.length) return null;
+  const m = weldFromEdit(), P = m.P.slice(), G = edit.groups, polys = [], newSel = [];
+  const addP = v => { P.push(v.x, v.y, v.z); return P.length / 3 - 1; };
+  for (const c of cuts) {
+    const A = [], B = [];
+    for (let i = 1; i <= n; i++) { const t = i / (n + 1); A.push(addP(G[c.x].p.clone().lerp(G[c.y].p, t))); B.push(addP(G[c.x2].p.clone().lerp(G[c.y2].p, t))); }
+    newSel.push(...A, ...B);
+    const xs = [c.x, ...A, c.y], ys = [c.x2, ...B, c.y2];
+    for (let i = 0; i <= n; i++) { const q = [xs[i], xs[i + 1], ys[i + 1], ys[i]]; if (!c.fwd) q.reverse(); polys.push(q); }
+  }
+  for (const e of ends) {
+    const L = edit.faces[e.fi].loop, pts = [];
+    for (let i = 1; i <= n; i++) pts.push(addP(G[e.x].p.clone().lerp(G[e.y].p, i / (n + 1))));
+    const out = [];
+    for (let i = 0; i < L.length; i++) {
+      const v = L[i], w = L[(i + 1) % L.length];
+      out.push(v);
+      if (v === e.x && w === e.y) out.push(...pts);
+      else if (v === e.y && w === e.x) out.push(...[...pts].reverse());
+    }
+    const startAt = (out.indexOf(e.x) > out.indexOf(e.y) ? out.indexOf(e.x) : out.indexOf(e.y)) + 1;
+    polys.push([...out.slice(startAt), ...out.slice(0, startAt)]);
+  }
+  const T = keepTrisExcept(new Set([...cuts.map(c => c.fi), ...ends.map(e => e.fi)]));
+  for (const f of polys) for (let i = 1; i < f.length - 1; i++) T.push(f[0], f[i], f[i + 1]);
+  const keys = new Set(newSel.map(i => posKey(P[i * 3], P[i * 3 + 1], P[i * 3 + 2])));
+  return { geo: unweld(cleanMesh({ P, T })), sel: keys };
+}
+function startLoopCut() {
+  if (S.mode !== 'edit') return;
+  const st = { cuts: 1, edge: null };
+  startXModal({
+    name: 'Loop Cut',
+    header: () => st.edge ? `Loop Cut · Number of Cuts: <b>${st.cuts}</b> &nbsp;<span style="color:var(--txt3)">wheel / + − to change</span>` : 'Loop Cut · hover an edge',
+    hints: [['mouse-l', 'Cut'], ['mouse-r', 'Cancel'], ['Wheel', 'Cuts']],
+    move() { st.edge = editPickEdge(mouse.lx, mouse.ly); },
+    wheel(d) { st.cuts = clamp(st.cuts + (d < 0 ? 1 : -1), 1, 64); },
+    key(e) { if (e.key === '+' || e.key === '=') st.cuts = Math.min(64, st.cuts + 1); if (e.key === '-') st.cuts = Math.max(1, st.cuts - 1); if (/^[1-9]$/.test(e.key)) st.cuts = +e.key; },
+    draw() {
+      if (!st.edge) return;
+      const { cuts, ends } = edgeRing(st.edge[0], st.edge[1]), mw = edit.obj.matrixWorld, G = edit.groups, a = {}, b = {};
+      octx.strokeStyle = '#ffe14d'; octx.lineWidth = 2; octx.beginPath();
+      for (const c of cuts) for (let i = 1; i <= st.cuts; i++) {
+        const t = i / (st.cuts + 1);
+        toScreen(G[c.x].p.clone().lerp(G[c.y].p, t).applyMatrix4(mw), a); toScreen(G[c.x2].p.clone().lerp(G[c.y2].p, t).applyMatrix4(mw), b);
+        if (a.ok && b.ok) { octx.moveTo(a.x, a.y); octx.lineTo(b.x, b.y); }
+      }
+      octx.stroke();
+      if (!cuts.length && !ends.length) { const p = {}; toScreen(G[st.edge[0]].p.clone().applyMatrix4(mw), p); octx.fillStyle = '#ff6b6b'; octx.fillText('no quad ring here', p.x + 8, p.y - 8); }
+    },
+    confirm() {
+      if (!st.edge) return;
+      const [a, b] = st.edge, ka = posKey(G2(a).x, G2(a).y, G2(a).z), kb = posKey(G2(b).x, G2(b).y, G2(b).z);
+      const ok = editOp('Loop Cut and Slide', { cuts: st.cuts }, p => { const ia = groupByKey(ka), ib = groupByKey(kb); return ia < 0 || ib < 0 ? null : loopCutGeometry(ia, ib, p.cuts); },
+        (p, re) => [field('Number of Cuts', numField({ get: () => p.cuts, set: v => { p.cuts = v; re(); }, int: true, min: 1, max: 64, commit: null }))]);
+      if (!ok) toast('That edge has no quad ring to cut', 'warn');
+    },
+  });
+}
+const G2 = i => edit.groups[i].p;
+/* ---- inset (individual faces) ---- */
+function insetGeometry({ t, depth }) {
+  const faces = [];
+  edit.faces.forEach((f, fi) => { if (faceSelected(f) && f.loop && f.loop.length === f.verts.size) faces.push(fi); });
+  if (!faces.length) return null;
+  const m = weldFromEdit(), P = m.P.slice(), G = edit.groups, sel = new Set();
+  const T = keepTrisExcept(new Set(faces));
+  for (const fi of faces) {
+    const f = edit.faces[fi], L = f.loop, c = new THREE.Vector3();
+    L.forEach(v => c.add(G[v].p)); c.multiplyScalar(1 / L.length);
+    const I = L.map(v => {
+      const p = G[v].p, d = c.clone().sub(p), len = d.length();
+      const q = p.clone().addScaledVector(d.normalize(), Math.min(Math.max(t, 0), len * 0.98)).addScaledVector(f.n, depth);
+      P.push(q.x, q.y, q.z); const id = P.length / 3 - 1; sel.add(id); return id;
+    });
+    for (let k = 0; k < L.length; k++) { const k1 = (k + 1) % L.length; T.push(L[k], L[k1], I[k1], L[k], I[k1], I[k]); }
+    for (let i = 1; i < I.length - 1; i++) T.push(I[0], I[i], I[i + 1]);
+  }
+  return { geo: unweld({ P, T }), sel: { idx: sel } };
+}
+function startInset() {
+  if (S.mode !== 'edit') return;
+  if (!edit.faces.some(faceSelected)) { toast('Select faces to inset', 'warn'); return; }
+  let avg = 0, n = 0;
+  edit.faces.filter(faceSelected).forEach(f => f.loop?.forEach((v, i) => { avg += G2(v).distanceTo(G2(f.loop[(i + 1) % f.loop.length])); n++; }));
+  avg = n ? avg / n : 1;
+  const params = { t: avg * 0.15, depth: 0 };
+  const fields = (p, re) => [
+    field('Thickness', numField({ get: () => p.t, set: v => { p.t = v; re(); }, min: 0, max: 1000, step: 0.01, unit: 'm', commit: null })),
+    field('Depth', numField({ get: () => p.depth, set: v => { p.depth = v; re(); }, min: -1000, max: 1000, step: 0.01, unit: 'm', commit: null }))];
+  if (!editOp('Inset Faces', params, insetGeometry, fields)) { toast('Inset needs simple faces', 'warn'); return; }
+  const sx = mouse.lx, t0 = params.t, k = avg / 250;
+  startXModal({
+    name: 'Inset',
+    header: () => `Inset · Thickness: <b>${fmt(params.t, 4)}</b> m &nbsp;Depth: <b>${fmt(params.depth, 4)}</b> m &nbsp;<span style="color:var(--txt3)">Ctrl: depth</span>`,
+    hints: [['mouse-l', 'Confirm'], ['mouse-r', 'Cancel'], ['Ctrl', 'Depth']],
+    move() { if (mouse.ctrl) params.depth = (mouse.lx - sx) * k * 0.5; else params.t = Math.max(0, t0 + (mouse.lx - sx) * k); execEditOp(false); markUI('fields'); },
+    confirm() {}, cancel() { hist.index--; restoreSnapshot(hist.stack[hist.index]); hist.stack.length = hist.index + 1; updateUndoButtons(); lastOpHide(); },
+  });
+}
+/* ---- loop selection, grow / shrink ---- */
+function edgeLoopVerts(a, b) {
+  const out = new Set([a, b]);
+  const walk = (prev, cur) => {
+    for (let guard = 0; guard < 200000; guard++) {
+      const nb = edit.vAdj.get(cur) || [];
+      if (nb.length !== 4) return;
+      const fPrev = new Set(facesOfEdge(prev, cur));
+      const cand = nb.filter(n => n !== prev && !facesOfEdge(cur, n).some(f => fPrev.has(f)));
+      if (cand.length !== 1 || out.has(cand[0])) return;
+      out.add(cand[0]); prev = cur; cur = cand[0];
+    }
+  };
+  walk(a, b); walk(b, a);
+  return out;
+}
+function loopSelect(lx, ly, extend) {
+  const e = editPickEdge(lx, ly);
+  if (!e) return;
+  let verts;
+  if (edit.selMode === 'face') { verts = new Set(); edgeRing(e[0], e[1]).cuts.forEach(c => edit.faces[c.fi].verts.forEach(v => verts.add(v))); }
+  else verts = edgeLoopVerts(e[0], e[1]);
+  if (!extend) edit.sel.clear();
+  verts.forEach(v => edit.sel.add(v));
+  updateEditColors();
+}
+function selectMoreLess(more) {
+  const add = new Set(), rem = new Set();
+  for (const [A, B, C] of edit.tris) {
+    const s = [A, B, C].map(v => edit.sel.has(v));
+    if (more && s.some(Boolean)) [A, B, C].forEach(v => add.add(v));
+    if (!more && s.some(x => !x)) [A, B, C].forEach(v => rem.add(v));
+  }
+  if (more) add.forEach(v => edit.sel.add(v)); else rem.forEach(v => edit.sel.delete(v));
+  updateEditColors();
+}
+/* ---- duplicate / separate / delete / merge ---- */
+function editDuplicate() {
+  if (S.mode !== 'edit') return;
+  const faces = edit.faces.filter(faceSelected);
+  if (!faces.length) { toast('Select faces to duplicate', 'warn'); return; }
+  const m = weldFromEdit(), P = m.P.slice(), T = m.T.slice(), map = new Map(), sel = new Set();
+  const nvOf = v => { let n = map.get(v); if (n === undefined) { n = P.length / 3; map.set(v, n); P.push(m.P[v * 3], m.P[v * 3 + 1], m.P[v * 3 + 2]); sel.add(n); } return n; };
+  for (const f of faces) for (const ti of f.tris) T.push(...edit.tris[ti].map(nvOf));
+  editReplaceGeometry(unweld({ P, T }), { idx: sel }, 'Duplicate');
+  startModal('grab');
+}
+function editSeparate() {
+  if (S.mode !== 'edit') return;
+  const sepF = new Set();
+  edit.faces.forEach((f, fi) => { if (faceSelected(f)) sepF.add(fi); });
+  if (!sepF.size) { toast('Select faces to separate', 'warn'); return; }
+  if (sepF.size === edit.faces.length) { toast('Cannot separate the whole mesh', 'warn'); return; }
+  const m = weldFromEdit(), sepT = [];
+  sepF.forEach(fi => edit.faces[fi].tris.forEach(ti => sepT.push(...edit.tris[ti])));
+  const o = edit.obj;
+  const n = newCustomMesh(unweld(cleanMesh({ P: m.P, T: sepT })), baseName(o.name), readMat(o.userData.mat));
+  n.userData.smooth = o.userData.smooth; n.rotation.order = o.rotation.order;
+  n.position.copy(o.position); n.quaternion.copy(o.quaternion); n.scale.copy(o.scale);
+  o.parent.add(n);
+  n.material = meshMaterialFor(n);
+  editReplaceGeometry(unweld(cleanMesh({ P: m.P, T: keepTrisExcept(sepF) })), null, 'Separate');
+  toast(`Separated into ${n.name}`, 'ok');
+}
+function editDeleteKind(kind) {
+  if (!edit.sel.size) return;
+  const s = edit.sel, m = weldFromEdit(), T = [];
+  edit.faces.forEach(f => {
+    let kill;
+    if (kind === 'faces') kill = faceSelected(f);
+    else if (kind === 'edges') kill = f.loop ? f.loop.some((v, i) => s.has(v) && s.has(f.loop[(i + 1) % f.loop.length])) : faceSelected(f);
+    else kill = [...f.verts].some(v => s.has(v));
+    if (!kill) for (const ti of f.tris) T.push(...edit.tris[ti]);
+  });
+  editReplaceGeometry(unweld(cleanMesh({ P: m.P, T })), null, 'Delete ' + kind[0].toUpperCase() + kind.slice(1));
+  toast('Deleted ' + kind);
+}
+function editMergeAt(where) {
+  if (edit.sel.size < 2) { toast('Select at least two vertices', 'warn'); return; }
+  let c;
+  if (where === 'cursor') c = edit.obj.worldToLocal(cursor3d.clone());
+  else { c = new THREE.Vector3(); edit.sel.forEach(i => c.add(edit.groups[i].p)); c.multiplyScalar(1 / edit.sel.size); }
+  const n = edit.sel.size;
+  edit.sel.forEach(i => edit.groups[i].p.copy(c));
+  editReplaceGeometry(unweld(cleanMesh(weldFromEdit())), new Set([posKey(c.x, c.y, c.z)]), 'Merge');
+  toast(`Merged ${n} vertices`);
+}
+function editMergeByDistance(dist = 0.001) {
+  const ids = edit.sel.size ? [...edit.sel] : edit.groups.map((_, i) => i), cells = new Map();
+  let merged = 0;
+  for (const i of ids) {
+    const p = edit.groups[i].p, k = Math.round(p.x / dist) + ',' + Math.round(p.y / dist) + ',' + Math.round(p.z / dist);
+    const c = cells.get(k);
+    if (c) { p.copy(c); merged++; } else cells.set(k, p.clone());
+  }
+  const keys = selectedKeys();
+  editReplaceGeometry(unweld(cleanMesh(weldFromEdit())), keys, 'Merge by Distance');
+  toast(`Removed ${merged} vertices`);
+}
+
+/* =====================================================================
+   Interactive tool modals (loop cut, inset, fly navigation)
+   ===================================================================== */
+let xmodal = null;
+function startXModal(def) {
+  if (modal || xmodal) return;
+  closeMenus();
+  xmodal = def;
+  if (tc.object) tc.detach();
+  def.move?.();
+  updateXModalHeader();
+  markUI('hints'); requestRender();
+}
+function updateXModalHeader() {
+  const mh = $('#modalHeader');
+  if (!xmodal) { mh.style.display = 'none'; return; }
+  mh.innerHTML = xmodal.header?.() || xmodal.name; mh.style.display = 'block';
+}
+function endXModal(ok) {
+  const m = xmodal;
+  if (!m) return;
+  xmodal = null;
+  ok ? m.confirm?.() : m.cancel?.();
+  m.end?.();
+  updateXModalHeader();
+  markUI('hints', 'fields', 'props', 'sidebar', 'stats'); requestRender();
 }
 
 /* =====================================================================
@@ -1980,9 +2897,9 @@ function applyTransforms(what = 'all') {
   if (!meshes.length) { toast('Apply works on mesh objects', 'warn'); return; }
   for (const o of meshes) keepChildren(o, () => {
     const m = new THREE.Matrix4().compose(what === 'all' ? o.position : new THREE.Vector3(), what === 'scale' ? new THREE.Quaternion() : o.quaternion, o.scale);
-    const g = o.geometry.clone().applyMatrix4(m);
+    const g = geoOf(o).clone().applyMatrix4(m);
     g.computeBoundingBox(); g.computeBoundingSphere();
-    o.geometry = g; o.userData.params = null; o.userData.prim = 'custom';
+    o.userData.params = null; o.userData.prim = 'custom'; setGeo(o, g);
     if (what === 'all') o.position.set(0, 0, 0);
     if (what !== 'scale') o.quaternion.identity();
     o.scale.set(1, 1, 1);
@@ -1994,13 +2911,13 @@ function setOrigin(mode) {
   if (!meshes.length) return;
   scene.updateMatrixWorld();
   for (const o of meshes) {
-    o.geometry.computeBoundingBox();
+    geoOf(o).computeBoundingBox();
     let c;
     if (mode === 'cursor') c = o.worldToLocal(cursor3d.clone());
-    else c = o.geometry.boundingBox.getCenter(new THREE.Vector3());
-    const g = o.geometry.clone(); g.translate(-c.x, -c.y, -c.z); g.computeBoundingBox(); g.computeBoundingSphere();
+    else c = geoOf(o).boundingBox.getCenter(new THREE.Vector3());
+    const g = geoOf(o).clone(); g.translate(-c.x, -c.y, -c.z); g.computeBoundingBox(); g.computeBoundingSphere();
     keepChildren(o, () => {
-      o.geometry = g; o.userData.params = null; o.userData.prim = 'custom';
+      o.userData.params = null; o.userData.prim = 'custom'; setGeo(o, g);
       if (mode !== 'geoToOrigin') o.position.add(c.clone().multiply(o.scale).applyQuaternion(o.quaternion));
     });
   }
@@ -2012,8 +2929,9 @@ function shade(smooth) {
     const u = o.userData;
     u.smooth = smooth;
     const d = readMat(u.mat); d.flatShading = !smooth; writeMat(u.mat, d); syncSolidMat(o);
-    if (smooth && !(u.params && PRIMS[u.prim]?.smooth)) o.geometry = smoothNormals(o.geometry.clone());
-    if (!smooth && u.params) o.geometry = buildPrimGeometry(u.prim, u.params, false);
+    if (smooth && !(u.params && PRIMS[u.prim]?.smooth)) setGeo(o, smoothNormals(geoOf(o).clone()));
+    if (!smooth && u.params) setGeo(o, buildPrimGeometry(u.prim, u.params, false));
+    evalMods(o, true);
   }
   if (list.length) pushHistory(smooth ? 'Shade Smooth' : 'Shade Flat');
 }
@@ -2023,7 +2941,7 @@ function joinSelected() {
   scene.updateMatrixWorld();
   const inv = active.matrixWorld.clone().invert();
   const geos = meshes.map(o => {
-    let g = o.geometry.clone();
+    let g = geoOf(o).clone();
     if (o !== active) g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, o.matrixWorld));
     const out = new THREE.BufferGeometry();
     out.setAttribute('position', g.attributes.position);
@@ -2037,7 +2955,7 @@ function joinSelected() {
   if (!merged) { toast('Join failed: incompatible geometry', 'err'); return; }
   merged.computeBoundingBox(); merged.computeBoundingSphere();
   for (const o of meshes) if (o !== active) { for (const c of userChildren(o)) active.attach(c); o.removeFromParent(); }
-  active.geometry = merged; active.userData.params = null; active.userData.prim = 'custom';
+  active.userData.params = null; active.userData.prim = 'custom'; setGeo(active, merged);
   setSel([active], active);
   pushHistory('Join');
   toast(`Joined ${meshes.length} objects`, 'ok');
@@ -2147,7 +3065,7 @@ const VIEWS = { front: [0, -1, 0, 'Front'], back: [0, 1, 0, 'Back'], right: [1, 
 function setViewAxis(name) {
   if (view.camView) exitCameraView();
   const [x, y, z, label] = VIEWS[name];
-  if (!view.ortho) { setOrtho(true); view.autoOrtho = true; }
+  if (!view.ortho && prefs.autoPersp !== false) { setOrtho(true); view.autoOrtho = true; }
   animateView(controls.target, new THREE.Vector3(x, y, z), viewCam.position.distanceTo(controls.target));
   view.axisName = label;
   markUI('info');
@@ -2469,6 +3387,10 @@ function vecField(label, getVec, opts = {}) {
   ['x', 'y', 'z'].forEach(k => box.append(numField({ label: k.toUpperCase(), axis: k, step: opts.step ?? 0.1, unit: opts.unit ?? 'm', prec: opts.prec ?? 4,
     get: () => (opts.scale ? opts.scale : 1) * getVec()[k],
     set: v => { opts.set ? opts.set(k, v) : (getVec()[k] = v / (opts.scale || 1)); }, commit: opts.commit, min: opts.min })));
+  if (opts.anim) {
+    const ref = () => { const K = opts.anim.userData.keys || [], keyed = K.some(x => x.f === anim.frame); box.querySelectorAll('.num').forEach(n => { n.classList.toggle('keyed', keyed); n.classList.toggle('animated', !keyed && K.length > 0); }); };
+    ref.el = box; liveFields.push(ref); ref();
+  }
   return field(label, box);
 }
 function colorField(label, get, set, commit = 'Change Color') {
@@ -2553,7 +3475,10 @@ function renderOutliner() {
       eye.addEventListener('click', e => { e.stopPropagation(); o.visible = !o.visible; if (!o.visible) { sel.delete(o); if (active === o) active = null; } onSelChanged(); pushHistory(o.visible ? 'Show' : 'Hide'); });
       const ptr = h('button', { class: 'rb' + (u.noSelect ? ' off' : ''), 'data-tip': 'Disable Selection' }, ic('pointer', 'sm'));
       ptr.addEventListener('click', e => { e.stopPropagation(); u.noSelect = !u.noSelect; if (u.noSelect) sel.delete(o); onSelChanged(); pushHistory('Toggle Selectable'); });
-      row.append(tw, ic(icn, 'tico ' + kcls), nm, ptr, eye);
+      const badges = h('span', { style: 'display:flex;gap:2px;color:var(--txt3)' },
+        u.mods?.length ? h('span', { 'data-tip': 'Modifiers|' + u.mods.map(m => MOD_TYPES[m.type].label).join(', ') }, ic('wrench', 'sm')) : null,
+        u.keys?.length ? h('span', { 'data-tip': 'Animated|' + u.keys.length + ' keyframes', style: 'color:#d9b43a' }, ic('key', 'sm')) : null);
+      row.append(tw, ic(icn, 'tico ' + kcls), nm, badges, ptr, eye);
       row.addEventListener('click', e => {
         if (S.mode === 'edit' && o !== edit.obj) exitEdit();
         if (e.ctrlKey || e.metaKey || e.shiftKey) { if (sel.has(o) && active === o) { sel.delete(o); active = null; } else { sel.add(o); active = o; } onSelChanged(); }
@@ -2613,13 +3538,13 @@ $('#outSearch').addEventListener('keydown', e => { e.stopPropagation(); if (e.ke
    ===================================================================== */
 let propTab = 'object';
 const PROP_TABS = [
-  ['render', 'render', 'Render Properties'], ['world', 'world', 'World Properties'], ['object', 'object', 'Object Properties'],
+  ['render', 'render', 'Render Properties'], ['world', 'world', 'World Properties'], ['object', 'object', 'Object Properties'], ['modifiers', 'wrench', 'Modifier Properties'],
   ['data', 'data', 'Object Data Properties'], ['material', 'material', 'Material Properties'],
 ];
 function renderProps() {
   const o = active && sel.has(active) ? active : null;
   const avail = ['render', 'world'];
-  if (o) { avail.push('object', 'data'); if (o.userData.kind === 'mesh') avail.push('material'); }
+  if (o) { avail.push('object', 'data'); if (o.userData.kind === 'mesh') avail.push('modifiers', 'material'); }
   if (!avail.includes(propTab)) propTab = o ? 'object' : 'world';
   const tabs = $('#propTabs'); tabs.innerHTML = '';
   for (const [id, icn, tipTxt] of PROP_TABS) {
@@ -2635,7 +3560,7 @@ function renderProps() {
   const scroll = body.scrollTop;
   body.innerHTML = '';
   $('#propCrumb').textContent = o ? o.name : 'Scene';
-  const build = { render: propsRender, world: propsWorld, object: propsObject, data: propsData, material: propsMaterial }[propTab];
+  const build = { render: propsRender, world: propsWorld, object: propsObject, modifiers: propsModifiers, data: propsData, material: propsMaterial }[propTab];
   body.append(...build(o).filter(Boolean));
   body.scrollTop = scroll;
 }
@@ -2718,10 +3643,10 @@ function propsObject(o) {
   return [
     h('div', { class: 'prop-head' }, ic(objIcon(o)[0]), textField(null, () => o.name, v => { if (v.trim()) o.name = uniqueName(v.trim(), o); markUI('outliner'); })),
     panel('o-transform', 'Transform', [
-      vecField('Location', () => o.position, { commit: 'Move' }),
-      vecField('Rotation', () => o.rotation, { unit: '°', scale: 1 / DEG, step: 1, prec: 2, commit: 'Rotate' }),
+      vecField('Location', () => o.position, { commit: 'Move' , anim: o }),
+      vecField('Rotation', () => o.rotation, { unit: '°', scale: 1 / DEG, step: 1, prec: 2, commit: 'Rotate' , anim: o }),
       selectField('Mode', [['ZYX', 'XYZ Euler'], ['XYZ', 'ZYX Euler'], ['YXZ', 'YXZ Euler'], ['ZXY', 'YZX Euler'], ['XZY', 'ZXY Euler'], ['YZX', 'XZY Euler']], () => o.rotation.order, v => { o.rotation.reorder(v); }, 'Rotation Mode'),
-      vecField('Scale', () => o.scale, { unit: '', step: 0.02, commit: 'Resize' }),
+      vecField('Scale', () => o.scale, { unit: '', step: 0.02, commit: 'Resize' , anim: o }),
     ]),
     panel('o-relations', 'Relations', [
       selectField('Parent', parents, () => o.parent === scene ? '' : String(o.parent.userData.id), v => {
@@ -2865,8 +3790,10 @@ function propsMaterial(o) {
     panel('m-surface', 'Surface', [
       colorField('Base Color', () => '#' + m.color.getHexString(), v => w({ color: v }), 'Base Color'),
       field('Texture', h('div', { class: 'btn-row' }, texInput,
-        btn(m.map ? (m.map.name || 'Image').slice(0, 16) : 'Load Image…', () => texInput.click(), 'image'),
+        btn(m.map ? (m.map.name || 'Image').slice(0, 16) : 'Image…', () => texInput.click(), 'image'),
+        h('button', { class: 'btn', 'data-tip': 'Generated Texture', onclick: e => { const r = e.currentTarget.getBoundingClientRect(); openMenu([['checker', 'Checker'], ['uvgrid', 'UV Grid'], ['noise', 'Noise'], ['marble', 'Marble'], ['bricks', 'Bricks']].map(([k, l]) => ({ label: l, icon: 'grid', run: () => { w({ map: genTexture(k), color: '#ffffff' }); pushHistory('Generated Texture'); markUI('props'); } })), r.left, r.bottom + 3, { title: 'Generated' }); } }, ic('demo', 'sm')),
         m.map ? btn('', () => { w({ map: null }); pushHistory('Remove Texture'); markUI('props'); }, 'close') : null)),
+      m.map ? field('Texture Scale', numField({ get: () => m.map.repeat.x, set: v => { m.map.repeat.set(v, v); requestRender(); }, min: 0.01, max: 100, step: 0.05, commit: null })) : null,
       sl('Metallic', 'metalness'), sl('Roughness', 'roughness'),
       field('IOR', numField({ get: () => m.ior, set: v => w({ ior: v }), min: 1, max: 2.333, step: 0.01, commit: 'Material IOR' })),
       sl('Alpha', 'opacity'), sl('Transmission', 'transmission'),
@@ -2886,6 +3813,186 @@ function propsMaterial(o) {
     ]),
   ];
 }
+
+/* =====================================================================
+   Modifier properties
+   ===================================================================== */
+function propsModifiers(o) {
+  const u = o.userData;
+  const addBtn = h('button', { class: 'btn primary', style: 'width:100%;margin-bottom:6px' }, ic('plus', 'sm'), 'Add Modifier', ic('chev', 'sm'));
+  addBtn.addEventListener('click', () => {
+    const r = addBtn.getBoundingClientRect();
+    openMenu(Object.entries(MOD_TYPES).map(([k, d]) => ({ label: d.label, icon: d.icon, run: () => { addModifier(o, k); pushHistory('Add Modifier'); markUI('props'); } })), r.left, r.bottom + 3, { title: 'Generate · Deform' });
+  });
+  const re = () => evalMods(o, true);
+  const rb = (icon, tipT, fn, off) => { const b = h('button', { class: 'rb' + (off ? ' off' : ''), 'data-tip': tipT }, ic(icon, 'sm')); b.addEventListener('click', e => { e.stopPropagation(); fn(); }); return b; };
+  const mfield = (label, md, k, o2 = {}) => field(label, numField({ get: () => md[k], set: v => { md[k] = v; re(); }, commit: 'Modifier Setting', ...o2 }));
+  const cards = u.mods.map((md, i) => {
+    const T = MOD_TYPES[md.type], pid = `mod-${u.id}-${i}`;
+    const card = h('div', { class: 'panel' + (closedPanels.has(pid) ? ' closed' : '') });
+    const head = h('div', { class: 'mod-head' }, ic('chev', 'chev'), ic(T.icon, 'sm mod-icon'), h('span', { class: 'grow' }, T.label),
+      rb(md.show === false ? 'eye-off' : 'eye', 'Show in Viewport', () => { md.show = md.show === false; re(); pushHistory('Toggle Modifier'); }, md.show === false),
+      i > 0 ? rb('chev-l', 'Move Up', () => { u.mods.splice(i - 1, 0, u.mods.splice(i, 1)[0]); re(); pushHistory('Move Modifier'); }) : null,
+      i < u.mods.length - 1 ? rb('chev-r', 'Move Down', () => { u.mods.splice(i + 1, 0, u.mods.splice(i, 1)[0]); re(); pushHistory('Move Modifier'); }) : null,
+      rb('check', 'Apply|Bake this modifier into the mesh', () => applyModifier(o, i)),
+      rb('close', 'Remove', () => { u.mods.splice(i, 1); re(); pushHistory('Remove Modifier'); }));
+    head.querySelector('.chev').style.cssText = 'width:10px;height:10px;transition:transform .18s';
+    if (closedPanels.has(pid)) head.querySelector('.chev').style.transform = 'rotate(-90deg)';
+    head.addEventListener('click', () => { card.classList.toggle('closed'); card.classList.contains('closed') ? closedPanels.add(pid) : closedPanels.delete(pid); head.querySelector('.chev').style.transform = card.classList.contains('closed') ? 'rotate(-90deg)' : ''; });
+    let body = [];
+    if (md.type === 'subsurf') body = [
+      field('Method', h('div', { class: 'btn-row joined' }, ...[['catmull', 'Catmull-Clark'], ['simple', 'Simple']].map(([v, l]) => h('button', { class: 'btn' + ((md.mode || 'catmull') === v ? ' on' : ''), onclick: () => { md.mode = v; re(); pushHistory('Modifier Setting'); } }, l)))),
+      mfield('Levels Viewport', md, 'levels', { int: true, min: 0, max: 5 }), info('Ctrl 0–5 sets the level')];
+    else if (md.type === 'mirror') body = [field('Axis', h('div', { class: 'btn-row joined' }, ...['x', 'y', 'z'].map(a => h('button', { class: 'btn' + (md[a] ? ' on' : ''), onclick: () => { md[a] = !md[a]; re(); pushHistory('Modifier Setting'); } }, a.toUpperCase()))))];
+    else if (md.type === 'array') body = [mfield('Count', md, 'count', { int: true, min: 1, max: 500 }),
+      field('Relative Offset', h('div', { class: 'vec' }, ...['x', 'y', 'z'].map(a => numField({ label: a.toUpperCase(), axis: a, get: () => md['o' + a], set: v => { md['o' + a] = v; re(); }, step: 0.05, commit: 'Modifier Setting' }))))];
+    else if (md.type === 'solidify') body = [mfield('Thickness', md, 'thickness', { step: 0.01, unit: 'm', min: -100, max: 100 }), mfield('Offset', md, 'offset', { min: -1, max: 1, slider: true, softMin: -1, softMax: 1 })];
+    else if (md.type === 'smooth') body = [mfield('Factor', md, 'factor', { min: -2, max: 2, slider: true, softMin: 0, softMax: 1 }), mfield('Repeat', md, 'repeat', { int: true, min: 0, max: 100 })];
+    card.append(head, h('div', { class: 'pb' }, ...body));
+    return card;
+  });
+  const st = geoStats(o.geometry);
+  return [
+    h('div', { class: 'prop-head' }, ic('wrench'), 'Modifiers'),
+    addBtn,
+    ...cards,
+    !u.mods.length ? info('No modifiers. Add a Subdivision Surface (Ctrl 1–5), Mirror, Array, Solidify or Smooth modifier — they are non-destructive.') : info(`Result: ${st.verts.toLocaleString()} vertices · ${st.tris.toLocaleString()} triangles`),
+  ];
+}
+
+/* =====================================================================
+   Animation timeline
+   ===================================================================== */
+const anim = { frame: 1, start: 1, end: 120, fps: 24, playing: false, autoKey: false, acc: 0, last: 0 };
+const AUTOKEY_LABELS = new Set(['Move', 'Rotate', 'Resize', 'Clear Location', 'Clear Rotation', 'Clear Scale', 'Snap Selection']);
+const _ka = new THREE.Vector3(), _kq = new THREE.Quaternion();
+function evalAnimation() {
+  if (modal || tc.dragging) return;
+  const f = anim.frame;
+  for (const o of userObjects()) {
+    const K = o.userData.keys;
+    if (!K?.length) continue;
+    let a = K[0], b = K[0], t = 0;
+    if (f >= K[K.length - 1].f) a = b = K[K.length - 1];
+    else if (f > K[0].f) {
+      let i = 0; while (K[i + 1].f <= f) i++;
+      a = K[i]; b = K[i + 1];
+      const x = (f - a.f) / (b.f - a.f); t = x * x * (3 - 2 * x);
+    }
+    o.position.fromArray(a.p).lerp(_ka.fromArray(b.p), t);
+    o.quaternion.fromArray(a.q).slerp(_kq.fromArray(b.q), t);
+    o.scale.fromArray(a.s).lerp(_ka.fromArray(b.s), t);
+  }
+}
+function setFrame(f) {
+  anim.frame = Math.round(f);
+  evalAnimation();
+  markUI('fields', 'timeline');
+}
+function animTargets() { return S.mode === 'object' ? selectedList() : []; }
+function insertKeys(silent = false) {
+  const list = animTargets();
+  if (!list.length) { if (!silent) toast('Select objects to keyframe', 'warn'); return; }
+  for (const o of list) {
+    const K = o.userData.keys || (o.userData.keys = []);
+    const k = { f: anim.frame, p: o.position.toArray(), q: o.quaternion.toArray(), s: o.scale.toArray() };
+    const i = K.findIndex(x => x.f === anim.frame);
+    i >= 0 ? (K[i] = k) : K.push(k);
+    K.sort((a, b) => a.f - b.f);
+  }
+  if (!silent) { pushHistory('Insert Keyframe'); toast(`Keyframe inserted at frame ${anim.frame}`, 'ok'); }
+  markUI('timeline', 'fields');
+}
+function deleteKeys() {
+  let n = 0;
+  for (const o of animTargets()) { const K = o.userData.keys || []; const i = K.findIndex(x => x.f === anim.frame); if (i >= 0) { K.splice(i, 1); n++; } }
+  if (n) { pushHistory('Delete Keyframe'); toast('Keyframe deleted'); } else toast('No keyframe on this frame', 'warn');
+  markUI('timeline', 'fields');
+}
+function clearKeys() { for (const o of animTargets()) o.userData.keys = []; pushHistory('Clear Keyframes'); markUI('timeline', 'fields'); }
+function keyFrames(all = false) {
+  const s = new Set();
+  for (const o of all ? userObjects() : selectedList()) for (const k of o.userData.keys || []) s.add(k.f);
+  return [...s].sort((a, b) => a - b);
+}
+function jumpKey(dir) {
+  let fr = keyFrames(); if (!fr.length) fr = keyFrames(true);
+  const f = dir > 0 ? fr.find(x => x > anim.frame) : [...fr].reverse().find(x => x < anim.frame);
+  if (f !== undefined) setFrame(f);
+}
+function togglePlay(force) {
+  anim.playing = force ?? !anim.playing;
+  anim.last = performance.now(); anim.acc = 0;
+  $('#tlPlay use').setAttribute('href', anim.playing ? '#i-pause' : '#i-play');
+  $('#tlPlay').classList.toggle('on', anim.playing);
+  requestRender();
+}
+function stepAnimation(now) {
+  if (!anim.playing) return;
+  anim.acc += (now - anim.last) * anim.fps / 1000;
+  anim.last = now;
+  if (anim.acc < 1) return;
+  const n = Math.floor(anim.acc); anim.acc -= n;
+  let f = anim.frame + n;
+  if (f > anim.end) f = anim.start + (f - anim.end - 1) % Math.max(1, anim.end - anim.start + 1);
+  setFrame(f);
+  requestRender();
+}
+const tlc = $('#tlCanvas'), tctx = tlc.getContext('2d');
+const TL_PAD = 16;
+const tlX = (f, W) => TL_PAD + (f - anim.start) / Math.max(1, anim.end - anim.start) * (W - TL_PAD * 2);
+function drawTimeline() {
+  if ($('#timeline').classList.contains('collapsed')) return;
+  const dpr = devicePixelRatio, W = tlc.clientWidth, H = tlc.clientHeight;
+  if (!W || !H) return;
+  if (tlc.width !== Math.round(W * dpr) || tlc.height !== Math.round(H * dpr)) { tlc.width = Math.round(W * dpr); tlc.height = Math.round(H * dpr); }
+  const c = tctx;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.fillStyle = '#1e1e1f'; c.fillRect(0, 0, W, H);
+  c.fillStyle = '#28282a'; c.fillRect(0, 0, W, 16);
+  const ppf = (W - TL_PAD * 2) / Math.max(1, anim.end - anim.start);
+  const step = [1, 2, 5, 10, 20, 25, 50, 100, 250, 500, 1000].find(s => s * ppf >= 42) || 1000;
+  c.font = '10px ' + getComputedStyle(document.body).fontFamily; c.textAlign = 'center'; c.textBaseline = 'middle';
+  for (let f = Math.ceil(anim.start / step) * step; f <= anim.end; f += step) {
+    const x = Math.round(tlX(f, W)) + .5;
+    c.fillStyle = 'rgba(255,255,255,.055)'; c.fillRect(x - .5, 16, 1, H - 16);
+    c.fillStyle = '#8a8a8f'; c.fillText(String(f), x, 8.5);
+  }
+  const sel = new Set(keyFrames()), all = keyFrames(true), y = 16 + (H - 16) / 2;
+  for (const f of all) {
+    const x = tlX(f, W), s = sel.has(f), r = s ? 5 : 3.5;
+    c.beginPath(); c.moveTo(x, y - r); c.lineTo(x + r, y); c.lineTo(x, y + r); c.lineTo(x - r, y); c.closePath();
+    c.fillStyle = s ? '#ffcf4d' : '#77777c'; c.fill(); c.strokeStyle = '#000'; c.lineWidth = 1; c.stroke();
+  }
+  const px = tlX(anim.frame, W);
+  c.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#4d7fe0'; c.fillRect(px - 1, 16, 2, H - 16);
+  const lbl = String(anim.frame), lw = Math.max(22, c.measureText(lbl).width + 10);
+  c.beginPath(); c.roundRect(px - lw / 2, 1, lw, 14, 4); c.fill();
+  c.fillStyle = '#fff'; c.fillText(lbl, px, 8.5);
+}
+tlc.addEventListener('pointerdown', e => {
+  tlc.setPointerCapture(e.pointerId);
+  const go = ev => { const r = tlc.getBoundingClientRect(); setFrame(clamp(anim.start + (ev.clientX - r.left - TL_PAD) / (r.width - TL_PAD * 2) * (anim.end - anim.start), anim.start, anim.end)); requestRender(); };
+  go(e);
+  const up = () => { tlc.removeEventListener('pointermove', go); tlc.removeEventListener('pointerup', up); };
+  tlc.addEventListener('pointermove', go); tlc.addEventListener('pointerup', up);
+});
+$('#tlPlay').addEventListener('click', () => togglePlay());
+$('#tlStart').addEventListener('click', () => setFrame(anim.start));
+$('#tlEnd').addEventListener('click', () => setFrame(anim.end));
+$('#tlPrevKey').addEventListener('click', () => jumpKey(-1));
+$('#tlNextKey').addEventListener('click', () => jumpKey(1));
+$('#tlKey').addEventListener('click', () => insertKeys());
+$('#tlKeyDel').addEventListener('click', () => deleteKeys());
+$('#tlRec').addEventListener('click', () => runCmd('anim.autokey'));
+$('#tlToggle').addEventListener('click', () => runCmd('view.timeline'));
+$('#tlFields').append(
+  h('span', { class: 'lbl' }, 'Frame'), numField({ get: () => anim.frame, set: v => setFrame(v), int: true, min: -10000, max: 100000, step: 1, commit: null }),
+  h('span', { class: 'lbl opt' }, 'Start'), numField({ get: () => anim.start, set: v => { anim.start = Math.min(v, anim.end - 1); markUI('timeline'); }, int: true, min: -10000, max: 100000, commit: null }),
+  h('span', { class: 'lbl opt' }, 'End'), numField({ get: () => anim.end, set: v => { anim.end = Math.max(v, anim.start + 1); markUI('timeline'); }, int: true, min: -10000, max: 100000, commit: null }),
+  h('span', { class: 'lbl opt' }, 'FPS'), numField({ get: () => anim.fps, set: v => { anim.fps = v; }, int: true, min: 1, max: 240, commit: null }));
+$$('#tlFields .num').forEach((n, i) => { if (i) n.classList.add('opt'); });
+new ResizeObserver(() => markUI('timeline')).observe(tlc);
 
 /* =====================================================================
    N-Sidebar & Adjust Last Operation
@@ -2910,9 +4017,9 @@ function renderSidebar() {
       const o = active;
       const dims = () => { const b = o.userData.kind === 'mesh' ? (o.geometry.computeBoundingBox(), o.geometry.boundingBox.getSize(new THREE.Vector3())) : new THREE.Vector3(); return b.multiply(o.scale); };
       body.append(panel('sb-tr', 'Transform', [
-        vecField('Location', () => o.position, { commit: 'Move' }),
-        vecField('Rotation', () => o.rotation, { unit: '°', scale: 1 / DEG, step: 1, prec: 2, commit: 'Rotate' }),
-        vecField('Scale', () => o.scale, { unit: '', step: 0.02, commit: 'Resize' }),
+        vecField('Location', () => o.position, { commit: 'Move' , anim: o }),
+        vecField('Rotation', () => o.rotation, { unit: '°', scale: 1 / DEG, step: 1, prec: 2, commit: 'Rotate' , anim: o }),
+        vecField('Scale', () => o.scale, { unit: '', step: 0.02, commit: 'Resize' , anim: o }),
         o.userData.kind === 'mesh' ? vecField('Dimensions', dims, { commit: 'Resize', min: 0, set: (k, v) => {
           o.geometry.computeBoundingBox(); const s = o.geometry.boundingBox.getSize(new THREE.Vector3())[k]; if (s > 1e-9) o.scale[k] = v / s; } }) : null,
       ]));
@@ -2929,6 +4036,15 @@ function renderSidebar() {
   }
 }
 let lastOp = null;
+function lastOpPanel(title, build) {
+  lastOp = { custom: true };
+  const el = $('#lastOp');
+  el.innerHTML = '';
+  const head = h('div', { class: 'lo-head' }, ic('chev', 'sm'), title);
+  head.addEventListener('click', () => el.classList.toggle('collapsed'));
+  el.append(head, h('div', { class: 'lo-body panel', style: 'border:0;background:none;margin:0' }, h('div', { class: 'pb', style: 'padding:0' }, ...build())));
+  el.style.display = 'block';
+}
 function lastOpShow(o) {
   lastOp = o;
   const el = $('#lastOp');
@@ -2944,6 +4060,7 @@ function lastOpShow(o) {
 }
 function lastOpHide() {
   if (!lastOp) return;
+  if (lastOp.custom) { lastOp = null; $('#lastOp').style.display = 'none'; return; }
   const l = hist.stack[hist.index]?.label || '';
   if (sel.size === 1 && sel.has(lastOp) && (l.startsWith('Add ') || l === 'Adjust Last Operation')) return;
   lastOp = null; $('#lastOp').style.display = 'none';
@@ -2958,6 +4075,7 @@ window.addEventListener('pointermove', e => {
   mouse.x = e.clientX; mouse.y = e.clientY;
   mouse.lx = e.clientX - vpRect.left; mouse.ly = e.clientY - vpRect.top;
   if (modal) { modal.cx = mouse.lx; modal.cy = mouse.ly; updateModal(); }
+  if (xmodal) { xmodal.look?.(e); xmodal.move?.(e); updateXModalHeader(); requestRender(); }
 }, { passive: true });
 canvas.addEventListener('pointerdown', e => {
   canvas.focus({ preventScroll: true });
@@ -2966,6 +4084,8 @@ canvas.addEventListener('pointerdown', e => {
     if (e.button === 0) confirmModal(); else if (e.button === 2) cancelModal();
     e.preventDefault(); return;
   }
+  if (xmodal) { if (e.button === 0) endXModal(true); else if (e.button === 2) endXModal(false); e.preventDefault(); return; }
+  if (e.button === 0 && e.altKey && S.mode === 'edit') { press = { x: e.clientX, y: e.clientY, alt: true, id: e.pointerId, shift: e.shiftKey }; return; }
   if (e.button === 2 && e.shiftKey) { cursor3d.copy(surfacePoint(e.clientX - vpRect.left, e.clientY - vpRect.top)); markUI('sidebar'); return; }
   if (e.button !== 0 || e.altKey) return;
   if (tc.dragging || (tc.object && tc.axis)) return;
@@ -2975,6 +4095,7 @@ canvas.addEventListener('pointerdown', e => {
 canvas.addEventListener('pointermove', e => {
   if (!press || press.id !== e.pointerId) return;
   const dx = e.clientX - press.x, dy = e.clientY - press.y;
+  if (press.alt) { if (Math.hypot(dx, dy) > 4) press = null; return; }
   if (press.touch) { if (Math.hypot(dx, dy) > 10) press = null; return; }
   if (!press.box && Math.hypot(dx, dy) > 5 && (S.tool !== 'cursor' || forceBox)) { press.box = true; canvas.setPointerCapture(e.pointerId); }
   if (press.box) {
@@ -2988,6 +4109,7 @@ canvas.addEventListener('pointerup', e => {
   const p = press; press = null;
   boxEl.style.display = 'none';
   const lx = e.clientX - vpRect.left, ly = e.clientY - vpRect.top;
+  if (p.alt) { loopSelect(lx, ly, p.shift); return; }
   if (p.box) {
     const r = { x0: Math.min(p.x, e.clientX) - vpRect.left, y0: Math.min(p.y, e.clientY) - vpRect.top, x1: Math.max(p.x, e.clientX) - vpRect.left, y1: Math.max(p.y, e.clientY) - vpRect.top };
     boxSelect(r, e.shiftKey ? 'add' : (e.ctrlKey || e.metaKey) ? 'sub' : 'set');
@@ -2997,19 +4119,29 @@ canvas.addEventListener('pointerup', e => {
   if (S.tool === 'cursor' && !forceBox) { cursor3d.copy(surfacePoint(lx, ly)); markUI('sidebar'); requestRender(); return; }
   clickSelect(lx, ly, p.shift, p.ctrl);
 });
+canvas.addEventListener('wheel', e => {
+  if (xmodal) { e.preventDefault(); e.stopImmediatePropagation(); xmodal.wheel?.(e.deltaY); updateXModalHeader(); requestRender(); return; }
+  if (!modal) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  if (S.prop.on) { S.prop.radius = clamp(S.prop.radius * (e.deltaY < 0 ? 1.12 : 1 / 1.12), 1e-3, 1e4); updateModal(); }
+}, { capture: true, passive: false });
 canvas.addEventListener('contextmenu', e => {
   e.preventDefault();
-  if (modal || e.shiftKey) return;
+  if (modal || xmodal || e.shiftKey) return;
   openContextMenu(e.clientX, e.clientY);
 });
 canvas.addEventListener('dblclick', e => { if (S.mode === 'edit' && e.button === 0) { editSelectLinked(); } });
 function clickSelect(lx, ly, shift, ctrl) {
   if (S.mode === 'edit') {
-    const i = editPick(lx, ly);
-    if (i < 0) { if (!shift) { edit.sel.clear(); updateEditColors(); } return; }
-    if (shift) edit.sel.has(i) ? edit.sel.delete(i) : edit.sel.add(i);
-    else if (ctrl) edit.sel.delete(i);
-    else { edit.sel.clear(); edit.sel.add(i); }
+    let verts = null;
+    if (edit.selMode === 'vert') { const i = editPick(lx, ly); if (i >= 0) verts = [i]; }
+    else if (edit.selMode === 'edge') verts = editPickEdge(lx, ly);
+    else { const f = editPickFace(lx, ly); if (f) verts = [...f.verts]; }
+    if (!verts) { if (!shift) { edit.sel.clear(); updateEditColors(); } return; }
+    const all = verts.every(v => edit.sel.has(v));
+    if (shift) verts.forEach(v => all ? edit.sel.delete(v) : edit.sel.add(v));
+    else if (ctrl) verts.forEach(v => edit.sel.delete(v));
+    else { edit.sel.clear(); verts.forEach(v => edit.sel.add(v)); }
     updateEditColors();
     return;
   }
@@ -3027,9 +4159,18 @@ function boxSelect(r, mode) {
   if (S.mode === 'edit') {
     projectGroups();
     if (mode === 'set') edit.sel.clear();
-    for (let i = 0; i < edit.groups.length; i++) {
-      if (!edit.vis[i] || !inR(edit.scr[i * 2], edit.scr[i * 2 + 1])) continue;
-      mode === 'sub' ? edit.sel.delete(i) : edit.sel.add(i);
+    const put = v => mode === 'sub' ? edit.sel.delete(v) : edit.sel.add(v);
+    const ins = i => edit.vis[i] && inR(edit.scr[i * 2], edit.scr[i * 2 + 1]);
+    if (edit.selMode === 'vert') { for (let i = 0; i < edit.groups.length; i++) if (ins(i)) put(i); }
+    else if (edit.selMode === 'edge') { const E = edit.edges; for (let i = 0; i < E.length; i += 2) if (ins(E[i]) && ins(E[i + 1])) { put(E[i]); put(E[i + 1]); } }
+    else {
+      const o = edit.obj, sp = {}, cp = viewCam.getWorldPosition(new THREE.Vector3()), nm = new THREE.Matrix3().getNormalMatrix(o.matrixWorld);
+      for (const f of edit.faces) {
+        const wc = f.c.clone().applyMatrix4(o.matrixWorld);
+        if (!S.xray && S.shading !== 'wire') { const n = f.n.clone().applyMatrix3(nm); const vdir = viewCam.isOrthographicCamera ? camForward() : wc.clone().sub(cp); if (n.dot(vdir) > 0) continue; }
+        toScreen(wc, sp);
+        if (sp.ok && inR(sp.x, sp.y)) f.verts.forEach(put);
+      }
     }
     updateEditColors();
     return;
@@ -3073,6 +4214,7 @@ function drawOverlay() {
     octx.fillStyle = 'rgba(255,255,255,.6)'; octx.font = '11px ' + getComputedStyle(document.body).fontFamily;
     octx.fillText(`${S.render.width} × ${S.render.height}`, x + 6, y + fh - 8);
   }
+  if (xmodal?.draw) { octx.font = '12px ' + getComputedStyle(document.body).fontFamily; xmodal.draw(); }
   if (!S.overlays) return drawModalGuides();
   const sp = {};
   if (S.ov.cursor) {
@@ -3102,17 +4244,28 @@ function drawOverlay() {
   if (S.mode === 'edit' && edit.obj) {
     projectGroups();
     const n = edit.groups.length, s = n > 20000 ? 2 : 3.2;
+    if (edit.selMode === 'face') {
+      const sp2 = {}, mw = edit.obj.matrixWorld;
+      if (S.xray || S.shading === 'wire') for (const f of edit.faces) { toScreen(f.c.clone().applyMatrix4(mw), sp2); if (!sp2.ok) continue; octx.fillStyle = faceSelected(f) ? '#ff8a1f' : '#111'; octx.fillRect(sp2.x - 2, sp2.y - 2, 4, 4); }
+    } else if (edit.selMode === 'vert') {
     octx.fillStyle = '#060606';
     for (let i = 0; i < n; i++) if (edit.vis[i] && !edit.sel.has(i)) octx.fillRect(edit.scr[i * 2] - s / 2, edit.scr[i * 2 + 1] - s / 2, s, s);
     octx.fillStyle = '#ff8a1f';
     const S2 = s + 1;
     for (const i of edit.sel) if (edit.vis[i]) octx.fillRect(edit.scr[i * 2] - S2 / 2, edit.scr[i * 2 + 1] - S2 / 2, S2, S2);
+    }
   }
   drawModalGuides();
 }
 function drawModalGuides() {
   if (!modal) return;
   const m = modal, sp = toScreen(m.pivot, {});
+  if (S.prop.on) {
+    const right = new THREE.Vector3(1, 0, 0).applyQuaternion(viewCam.quaternion).multiplyScalar(S.prop.radius);
+    const e = toScreen(m.pivot.clone().add(right), {}), r = Math.hypot(e.x - sp.x, e.y - sp.y);
+    octx.setLineDash([5, 4]); octx.strokeStyle = 'rgba(255,255,255,.7)'; octx.lineWidth = 1;
+    octx.beginPath(); octx.arc(sp.x, sp.y, r, 0, Math.PI * 2); octx.stroke(); octx.setLineDash([]);
+  }
   const av = modalAxisVec();
   if (av) {
     const s2 = toScreen(m.pivot.clone().add(av.clone().multiplyScalar(0.01)), {});
@@ -3213,17 +4366,22 @@ $$('#shadingSeg button').forEach(b => b.addEventListener('click', () => setShadi
 $('#xrayBtn').addEventListener('click', () => runCmd('shade.xray'));
 $('#overlayBtn').addEventListener('click', () => runCmd('shade.overlays'));
 $('#snapBtn').addEventListener('click', () => runCmd('snap.toggle'));
+$('#propBtn').addEventListener('click', () => runCmd('edit.prop'));
+$$('#selModeSeg button').forEach(b => b.addEventListener('click', () => setSelectMode(b.dataset.selmode)));
 function modeUI() {
   const b = $('#modeBtn');
   b.querySelector('use').setAttribute('href', S.mode === 'edit' ? '#i-vert' : '#i-object');
   b.querySelector('span').textContent = S.mode === 'edit' ? 'Edit Mode' : 'Object Mode';
   $('#objMenuBtn').textContent = S.mode === 'edit' ? 'Mesh' : 'Object';
+  $('#vpArea').classList.toggle('editing', S.mode === 'edit');
+  $$('#selModeSeg button').forEach(x => x.classList.toggle('on', x.dataset.selmode === edit.selMode));
   markUI('hints', 'info', 'sidebar', 'props', 'stats');
   updateSelectionVisuals();
 }
 function headerUI() {
   $('#orientBtn span').textContent = S.orientation === 'local' ? 'Local' : 'Global';
   $('#snapBtn').classList.toggle('on', S.snap);
+  $('#propBtn').classList.toggle('on', S.prop.on);
   $('#pivotBtn use').setAttribute('href', { median: '#i-pivot', cursor: '#i-cursor', individual: '#i-origin', active: '#i-object', bounds: '#i-grid' }[S.pivot]);
   syncGizmo(); requestRender();
 }
@@ -3236,8 +4394,9 @@ function hint(iconOrKey, text, opt = false) {
 }
 function renderHints() {
   const el = $('#hints'); el.innerHTML = '';
-  if (modal) el.append(hint('mouse-l', 'Confirm'), hint('mouse-r', 'Cancel'), hint('X Y Z', 'Axis'), hint('Shift X', 'Plane', true), hint('Ctrl', 'Snap', true), hint('0-9', 'Value', true));
-  else if (S.mode === 'edit') el.append(hint('mouse-l', 'Select Vertex'), hint('mouse-m', 'Rotate View'), hint('mouse-r', 'Vertex Menu'), hint('G R S', 'Transform', true), hint('Tab', 'Object Mode', true));
+  if (xmodal) el.append(...xmodal.hints.map(([a, b]) => hint(a, b)));
+  else if (modal) el.append(hint('mouse-l', 'Confirm'), hint('mouse-r', 'Cancel'), hint('X Y Z', 'Axis'), hint('Shift X', 'Plane', true), hint('Ctrl', 'Snap', true), hint('0-9', 'Value', true));
+  else if (S.mode === 'edit') el.append(hint('mouse-l', 'Select ' + { vert: 'Vertex', edge: 'Edge', face: 'Face' }[edit.selMode]), hint('1 2 3', 'Select Mode', true), hint('E', 'Extrude', true), hint('mouse-m', 'Rotate View'), hint('mouse-r', 'Vertex Menu'), hint('G R S', 'Transform', true), hint('Tab', 'Object Mode', true));
   else el.append(hint('mouse-l', S.tool === 'cursor' ? 'Place Cursor' : 'Select'), hint('mouse-m', 'Rotate View'), hint('mouse-r', 'Context Menu'), hint('Shift A', 'Add', true), hint('G R S', 'Transform', true), hint('F3', 'Search', true));
 }
 let fps = 0, frames = 0, fpsT = performance.now();
@@ -3248,7 +4407,11 @@ function renderStatus() {
   for (const o of statObjs) { if (o?.userData.kind !== 'mesh') continue; const s = geoStats(o.geometry); v += s.verts; t += s.tris; }
   const el = $('#statusRight'); el.innerHTML = '';
   const st = (label, val) => h('span', { class: 'st' }, label + ' ', h('b', {}, val));
-  if (S.mode === 'edit') el.append(st('Verts', `${edit.sel.size.toLocaleString()}/${edit.groups.length.toLocaleString()}`), st('Tris', t.toLocaleString()));
+  if (S.mode === 'edit') {
+    const E = edit.edges; let es = 0; for (let i = 0; i < E.length; i += 2) if (edit.sel.has(E[i]) && edit.sel.has(E[i + 1])) es++;
+    el.append(st('Verts', `${edit.sel.size.toLocaleString()}/${edit.groups.length.toLocaleString()}`), st('Edges', `${es.toLocaleString()}/${(E.length / 2).toLocaleString()}`),
+      st('Faces', `${edit.faces.filter(faceSelected).length.toLocaleString()}/${edit.faces.length.toLocaleString()}`), st('Tris', t.toLocaleString()));
+  }
   else el.append(st('Objects', `${sel.size}/${all.length}`), st('Verts', v.toLocaleString()), st('Tris', t.toLocaleString()));
   el.append(h('span', { class: 'pill' }, BACKEND), h('span', { class: 'pill', id: 'fpsPill' }, fps ? fps + ' fps' : 'idle'), h('span', { class: 'hide-sm', style: 'color:var(--txt3)' }, 'r' + THREE.REVISION));
   if (S.ov.stats) dirty.info = true;
@@ -3261,6 +4424,7 @@ function renderInfo() {
   if (view.camView) name = 'Camera Perspective';
   else if (view.axisName) name = `${view.axisName} ${view.ortho ? 'Orthographic' : 'Perspective'}`;
   else name = `User ${view.ortho ? 'Orthographic' : 'Perspective'}`;
+  if (view.local) name += ' (Local)';
   const act = active && sel.has(active) ? active.name : '';
   el.innerHTML = '';
   el.append(h('div', {}, name), h('div', { class: 'dim' }, `(1) Scene Collection${act ? ' | ' + act : ''}`));
@@ -3359,6 +4523,49 @@ cmd('mesh.delete', 'Delete Vertices', editDelete, { icon: 'trash', key: 'X', ena
 cmd('mesh.merge', 'Merge at Center', editMerge, { icon: 'merge', key: 'M', enabled: () => isEdit() && edit.sel.size > 1, cat: 'Mesh' });
 cmd('mesh.randomize', 'Randomize Vertices', () => editRandomize(0.1), { icon: 'random', enabled: () => isEdit() && edit.sel.size > 0, cat: 'Mesh' });
 cmd('mesh.flip', 'Flip Normals', () => { flipNormals(edit.obj); buildEditData(); pushHistory('Flip Normals'); }, { enabled: isEdit, cat: 'Mesh' });
+cmd('mesh.subdivide', 'Subdivide', () => editSubdivide(1, 0), { icon: 'subdivide', enabled: isEdit, cat: 'Mesh' });
+cmd('mesh.subdivideSmooth', 'Subdivide Smooth', () => editSubdivide(1, 1), { icon: 'subdivide', enabled: isEdit, cat: 'Mesh' });
+cmd('mesh.extrude', 'Extrude Region', editExtrude, { icon: 'extrude', key: 'E', enabled: isEdit, cat: 'Mesh' });
+cmd('mesh.fill', 'Fill', editFill, { icon: 'fill', key: 'F', enabled: () => isEdit() && edit.sel.size >= 3, cat: 'Mesh' });
+cmd('selmode.vert', 'Vertex Select Mode', () => setSelectMode('vert'), { icon: 'vertsel', key: '1', enabled: isEdit, checked: () => edit.selMode === 'vert', cat: 'Select Mode' });
+cmd('selmode.edge', 'Edge Select Mode', () => setSelectMode('edge'), { icon: 'edge', key: '2', enabled: isEdit, checked: () => edit.selMode === 'edge', cat: 'Select Mode' });
+cmd('selmode.face', 'Face Select Mode', () => setSelectMode('face'), { icon: 'face', key: '3', enabled: isEdit, checked: () => edit.selMode === 'face', cat: 'Select Mode' });
+cmd('edit.prop', 'Proportional Editing', () => { S.prop.on = !S.prop.on; headerUI(); toast('Proportional editing ' + (S.prop.on ? 'on — scroll while transforming to resize' : 'off')); }, { icon: 'prop', key: 'O', checked: () => S.prop.on, cat: 'Edit' });
+for (let i = 0; i <= 5; i++) cmd('mod.subsurf' + i, 'Subdivision Set ' + i, () => setSubsurfLevel(i), { icon: 'subdivide', key: 'Ctrl ' + i, cat: 'Modifier' });
+for (const [k, d] of Object.entries(MOD_TYPES)) cmd('mod.add.' + k, d.label, () => { const list = selectedList().filter(o => o.userData.kind === 'mesh'); if (!list.length) return toast('Select a mesh object', 'warn'); list.forEach(o => addModifier(o, k)); pushHistory('Add Modifier'); propTab = 'modifiers'; markUI('props'); }, { icon: d.icon, cat: 'Add Modifier' });
+cmd('anim.play', 'Play Animation', () => togglePlay(), { icon: 'play', key: 'Space', cat: 'Animation' });
+cmd('anim.key', 'Insert Keyframe', () => insertKeys(), { icon: 'key', key: 'I', enabled: inObj, cat: 'Animation' });
+cmd('anim.keyDel', 'Delete Keyframe', deleteKeys, { icon: 'key-del', key: 'Alt I', enabled: inObj, cat: 'Animation' });
+cmd('anim.clear', 'Clear Keyframes', clearKeys, { enabled: objSel, cat: 'Animation' });
+cmd('anim.start', 'Jump to Start', () => setFrame(anim.start), { icon: 'skip-start', key: 'Shift ←', cat: 'Animation' });
+cmd('anim.end', 'Jump to End', () => setFrame(anim.end), { icon: 'skip-end', key: 'Shift →', cat: 'Animation' });
+cmd('anim.next', 'Next Frame', () => setFrame(anim.frame + 1), { key: '→', cat: 'Animation' });
+cmd('anim.prev', 'Previous Frame', () => setFrame(anim.frame - 1), { key: '←', cat: 'Animation' });
+cmd('anim.nextKey', 'Jump to Next Keyframe', () => jumpKey(1), { key: '↑', cat: 'Animation' });
+cmd('anim.prevKey', 'Jump to Previous Keyframe', () => jumpKey(-1), { key: '↓', cat: 'Animation' });
+cmd('anim.autokey', 'Auto Keying', () => { anim.autoKey = !anim.autoKey; $('#tlRec').classList.toggle('on', anim.autoKey); toast('Auto keying ' + (anim.autoKey ? 'on' : 'off')); }, { icon: 'record', checked: () => anim.autoKey, cat: 'Animation' });
+cmd('view.timeline', 'Timeline', () => { $('#timeline').classList.toggle('collapsed'); markUI('timeline'); }, { icon: 'timeline', checked: () => !$('#timeline').classList.contains('collapsed') });
+cmd('mesh.loopcut', 'Loop Cut and Slide', startLoopCut, { icon: 'subdivide', key: 'Ctrl R', enabled: isEdit, cat: 'Mesh' });
+cmd('mesh.inset', 'Inset Faces', startInset, { icon: 'face', key: 'I', enabled: isEdit, cat: 'Mesh' });
+cmd('mesh.duplicate', 'Duplicate', editDuplicate, { icon: 'copy', key: 'Shift D', enabled: isEdit, cat: 'Mesh' });
+cmd('mesh.separate', 'Separate Selection', editSeparate, { icon: 'join', key: 'P', enabled: isEdit, cat: 'Mesh' });
+cmd('mesh.delVerts', 'Vertices', () => editDeleteKind('verts'), { icon: 'vertsel', enabled: isEdit, cat: 'Delete' });
+cmd('mesh.delEdges', 'Edges', () => editDeleteKind('edges'), { icon: 'edge', enabled: isEdit, cat: 'Delete' });
+cmd('mesh.delFaces', 'Faces', () => editDeleteKind('faces'), { icon: 'face', enabled: isEdit, cat: 'Delete' });
+cmd('mesh.mergeCenter', 'At Center', () => editMergeAt('center'), { icon: 'merge', enabled: isEdit, cat: 'Merge' });
+cmd('mesh.mergeCursor', 'At Cursor', () => editMergeAt('cursor'), { icon: 'cursor', enabled: isEdit, cat: 'Merge' });
+cmd('mesh.mergeDist', 'By Distance', () => editMergeByDistance(0.001), { icon: 'merge', enabled: isEdit, cat: 'Merge' });
+cmd('select.more', 'More', () => selectMoreLess(true), { key: 'Ctrl Numpad +', enabled: isEdit, cat: 'Select' });
+cmd('select.less', 'Less', () => selectMoreLess(false), { key: 'Ctrl Numpad −', enabled: isEdit, cat: 'Select' });
+cmd('menu.delete', 'Delete', () => openMenu(['mesh.delVerts', 'mesh.delEdges', 'mesh.delFaces'], mouse.x - 30, mouse.y - 20, { title: 'Delete' }), { key: 'X', hidden: true });
+cmd('menu.merge', 'Merge', () => openMenu(['mesh.mergeCenter', 'mesh.mergeCursor', '-', 'mesh.mergeDist'], mouse.x - 30, mouse.y - 20, { title: 'Merge' }), { key: 'M', hidden: true });
+cmd('obj.copy', 'Copy Objects', copySelected, { icon: 'copy', key: 'Ctrl C', enabled: objSel });
+cmd('obj.paste', 'Paste Objects', () => pasteObjects(), { icon: 'copy', key: 'Ctrl V', enabled: inObj });
+cmd('view.local', 'Toggle Local View', toggleLocalView, { icon: 'zoom', key: 'Numpad /', checked: () => !!view.local });
+cmd('view.fly', 'Fly Navigation', startFly, { icon: 'hand', key: 'Shift `' });
+cmd('render.anim', 'Render Animation', () => renderAnimation(), { icon: 'render', key: 'Ctrl F12' });
+cmd('add.imagePlane', 'Image as Plane', () => addImagePlane(), { icon: 'image', cat: 'Add' });
+cmd('edit.prefs', 'Preferences…', showPrefs, { icon: 'gear', key: 'Ctrl Alt U' });
 // Shading & overlays
 cmd('shade.wire', 'Wireframe', () => setShading('wire'), { icon: 'wire', cat: 'Shading' });
 cmd('shade.solid', 'Solid', () => setShading('solid'), { icon: 'solid', cat: 'Shading' });
@@ -3389,8 +4596,8 @@ const SNAP_ITEMS = ['snap.selGrid', 'snap.selCursor', '-', 'snap.cursorSel', 'sn
 function addMenuItems() {
   return [
     { header: 'Mesh' },
-    ...['plane', 'cube', 'circle', 'uvsphere', 'icosphere', 'cylinder', 'cone', 'torus', 'capsule', 'torusknot'].map(k => 'add.' + k),
-    '-', 'add.text',
+    ...['plane', 'cube', 'circle', 'uvsphere', 'icosphere', 'cylinder', 'cone', 'torus', 'grid', 'capsule', 'torusknot'].map(k => 'add.' + k),
+    '-', 'add.text', 'add.imagePlane',
     { label: 'Light', icon: 'light', sub: ['add.point', 'add.sun', 'add.spot'] },
     'add.camera', 'add.empty',
   ];
@@ -3401,31 +4608,38 @@ const orientItems = () => [['global', 'Global'], ['local', 'Local']].map(([v, l]
 const MENUS = {
   file: () => ['file.new', 'file.open', 'file.recover', '-', 'file.save', '-',
     { label: 'Import', icon: 'import', sub: ['import.gltf', 'import.obj', 'import.stl'] }, { label: 'Export', icon: 'export', sub: ['export.glb', 'export.obj', 'export.stl'] }, '-', 'file.demo'],
-  edit: () => ['edit.undo', 'edit.redo', { label: 'Undo History', icon: 'undo', sub: () => hist.stack.map((s, i) => ({ label: s.label, checked: i === hist.index, run: () => { hist.index = i; restoreSnapshot(hist.stack[i]); updateUndoButtons(); } })).reverse().slice(0, 30) }, '-', 'edit.search'],
-  render: () => ['render.image', 'render.last', '-', 'shade.material', 'shade.rendered'],
+  edit: () => ['edit.undo', 'edit.redo', { label: 'Undo History', icon: 'undo', sub: () => hist.stack.map((s, i) => ({ label: s.label, checked: i === hist.index, run: () => { hist.index = i; restoreSnapshot(hist.stack[i]); updateUndoButtons(); } })).reverse().slice(0, 30) }, '-', 'obj.copy', 'obj.paste', '-', 'edit.search', 'edit.prefs'],
+  render: () => ['render.image', 'render.anim', 'render.last', '-', 'shade.material', 'shade.rendered'],
   help: () => ['help.keys', 'help.splash', '-', 'help.about'],
   view: () => ['view.toolbar', 'view.sidebar', '-', 'view.frameSel', 'view.frameAll', 'view.cursorReset', '-',
     { label: 'Viewpoint', icon: 'camera', sub: ['view.camera', '-', 'view.top', 'view.bottom', '-', 'view.front', 'view.back', '-', 'view.right', 'view.left'] },
-    'view.persp', 'view.alignCam', '-', 'view.max'],
-  select: () => isEdit() ? ['select.all', 'select.none', 'select.invert', '-', 'select.box', 'select.linked']
+    'view.persp', 'view.alignCam', '-', 'view.local', 'view.fly', '-', 'view.timeline', 'view.max'],
+  select: () => isEdit() ? ['select.all', 'select.none', 'select.invert', '-', 'select.box', 'select.linked', 'select.more', 'select.less', { label: 'Select Loops', icon: 'edge', run: () => toast('Alt + click an edge to select an edge loop (face loop in Face mode)') }]
     : ['select.all', 'select.none', 'select.invert', '-', 'select.box', { label: 'Select All by Type', icon: 'filter', sub: ['select.mesh', 'select.light', 'select.camera', 'select.empty'] }],
   add: addMenuItems,
-  object: () => isEdit() ? ['obj.editToggle', '-', { label: 'Transform', icon: 'move', sub: ['obj.grab', 'obj.rotate', 'obj.scale', '-', 'mesh.randomize'] },
-    { label: 'Snap', icon: 'magnet', sub: SNAP_ITEMS }, '-', 'mesh.merge', 'mesh.flip', '-', 'obj.smooth', 'obj.flat', '-', 'mesh.delete']
+  object: () => isEdit() ? ['obj.editToggle', { label: 'Select Mode', icon: 'vertsel', sub: ['selmode.vert', 'selmode.edge', 'selmode.face'] }, '-',
+    { label: 'Transform', icon: 'move', sub: ['obj.grab', 'obj.rotate', 'obj.scale', '-', 'mesh.randomize'] }, { label: 'Snap', icon: 'magnet', sub: SNAP_ITEMS }, 'edit.prop', '-',
+    'mesh.extrude', 'mesh.inset', 'mesh.loopcut', 'mesh.subdivide', 'mesh.subdivideSmooth', 'mesh.fill', '-', 'mesh.duplicate', 'mesh.separate',
+    { label: 'Merge', icon: 'merge', sub: ['mesh.mergeCenter', 'mesh.mergeCursor', '-', 'mesh.mergeDist'] }, '-', 'mesh.flip', 'obj.smooth', 'obj.flat', '-',
+    { label: 'Subdivision Surface', icon: 'subdivide', sub: [0, 1, 2, 3, 4, 5].map(i => 'mod.subsurf' + i) }, '-',
+    { label: 'Delete', icon: 'trash', sub: ['mesh.delVerts', 'mesh.delEdges', 'mesh.delFaces'] }]
     : ['obj.editToggle', '-', { label: 'Transform', icon: 'move', sub: ['obj.grab', 'obj.rotate', 'obj.scale'] },
       { label: 'Clear', sub: ['obj.clearLoc', 'obj.clearRot', 'obj.clearScale'] }, { label: 'Apply', sub: ['obj.applyAll', 'obj.applyRotScale', 'obj.applyScale'] },
       { label: 'Snap', icon: 'magnet', sub: SNAP_ITEMS }, { label: 'Set Origin', icon: 'origin', sub: ['obj.originGeo', 'obj.geoOrigin', 'obj.originCursor'] }, '-',
       'obj.duplicate', 'obj.join', '-', { label: 'Parent', icon: 'parent', sub: ['obj.parent', 'obj.clearParent'] }, '-', 'obj.smooth', 'obj.flat', '-',
+      { label: 'Add Modifier', icon: 'wrench', sub: Object.keys(MOD_TYPES).map(k => 'mod.add.' + k) }, { label: 'Subdivision Surface', icon: 'subdivide', sub: [0, 1, 2, 3, 4, 5].map(i => 'mod.subsurf' + i) },
+      { label: 'Animation', icon: 'key', sub: ['anim.key', 'anim.keyDel', 'anim.clear', '-', 'anim.autokey'] }, '-',
       { label: 'Show / Hide', icon: 'eye', sub: ['obj.hide', 'obj.hideOthers', 'obj.reveal'] }, '-', 'obj.rename', 'obj.delete'],
 };
 function openContextMenu(x, y) {
-  if (isEdit()) return openMenu(['mesh.merge', 'mesh.randomize', 'select.linked', 'mesh.flip', '-', 'obj.smooth', 'obj.flat', '-', { label: 'Snap', icon: 'magnet', sub: SNAP_ITEMS }, '-', 'mesh.delete'], x, y, { title: 'Vertex Context Menu' });
+  if (isEdit()) return openMenu(['mesh.extrude', 'mesh.inset', 'mesh.loopcut', 'mesh.subdivide', 'mesh.subdivideSmooth', 'mesh.fill', { label: 'Merge', icon: 'merge', sub: ['mesh.mergeCenter', 'mesh.mergeCursor', '-', 'mesh.mergeDist'] }, 'mesh.separate', '-', 'mesh.randomize', 'select.linked', 'mesh.flip', '-', 'obj.smooth', 'obj.flat', '-', { label: 'Snap', icon: 'magnet', sub: SNAP_ITEMS }, '-', 'mesh.delete'], x, y, { title: { vert: 'Vertex', edge: 'Edge', face: 'Face' }[edit.selMode] + ' Context Menu' });
   const o = pickAt(x - vpRect.left, y - vpRect.top);
   if (o && !sel.has(o)) setSel([o], o);
-  if (!selectedList().length) return openMenu([{ label: 'Add', icon: 'plus', sub: addMenuItems() }, '-', 'snap.cursorWorld', 'view.frameAll', 'select.all', 'obj.reveal'], x, y, { title: 'Viewport' });
+  if (!selectedList().length) return openMenu([{ label: 'Add', icon: 'plus', sub: addMenuItems() }, 'obj.paste', '-', 'snap.cursorWorld', 'view.frameAll', 'select.all', 'obj.reveal'], x, y, { title: 'Viewport' });
   openMenu(['obj.smooth', 'obj.flat', '-', { label: 'Set Origin', icon: 'origin', sub: ['obj.originGeo', 'obj.geoOrigin', 'obj.originCursor'] },
     { label: 'Apply', sub: ['obj.applyAll', 'obj.applyRotScale', 'obj.applyScale'] }, '-', 'obj.duplicate', 'obj.join', '-',
-    { label: 'Parent', icon: 'parent', sub: ['obj.parent', 'obj.clearParent'] }, { label: 'Snap', icon: 'magnet', sub: SNAP_ITEMS }, '-', 'view.frameSel', 'obj.editToggle', '-', 'obj.delete'],
+    { label: 'Parent', icon: 'parent', sub: ['obj.parent', 'obj.clearParent'] }, { label: 'Snap', icon: 'magnet', sub: SNAP_ITEMS },
+    { label: 'Add Modifier', icon: 'wrench', sub: Object.keys(MOD_TYPES).map(k => 'mod.add.' + k) }, '-', 'obj.copy', 'anim.key', 'view.frameSel', 'view.local', 'obj.editToggle', '-', 'obj.delete'],
     x, y, { title: 'Object Context Menu' });
 }
 $$('[data-menu]').forEach(b => {
@@ -3442,7 +4656,7 @@ dropMenu($('#snapMenuBtn'), () => [
   ...[5, 15, 45, 90].map(v => ({ label: `Rotate: ${v}°`, checked: S.rotInc === v, run: () => { S.rotInc = v; headerUI(); } })), '-',
   { label: S.snap ? 'Disable Snapping' : 'Enable Snapping', icon: 'magnet', run: () => runCmd('snap.toggle') }], 'Snap Increment');
 dropMenu($('#overlayMenuBtn'), () => [
-  ...[['grid', 'Floor Grid'], ['cursor', '3D Cursor'], ['origins', 'Origins'], ['outline', 'Selection Outline'], ['stats', 'Statistics']].map(([k, l]) => ({ label: l, checked: S.ov[k], run: () => { S.ov[k] = !S.ov[k]; updateOverlayVisibility(); updateSelectionVisuals(); markUI('info', 'stats'); } })),
+  ...[['grid', 'Floor Grid'], ['cursor', '3D Cursor'], ['origins', 'Origins'], ['outline', 'Selection Outline'], ['stats', 'Statistics'], ['wireframe', 'Wireframe'], ['faceOrient', 'Face Orientation']].map(([k, l]) => ({ label: l, checked: S.ov[k], run: () => { S.ov[k] = !S.ov[k]; if (k === 'faceOrient') applyShading(); updateOverlayVisibility(); updateSelectionVisuals(); markUI('info', 'stats'); } })),
 ], 'Viewport Overlays');
 $('#outAdd').addEventListener('click', e => { const r = e.currentTarget.getBoundingClientRect(); openMenu(addMenuItems(), r.left - 150, r.bottom + 3, { title: 'Add' }); });
 $('#undoBtn').addEventListener('click', undo);
@@ -3472,18 +4686,23 @@ const KEYMAP = {
     'n': 'view.sidebar', 't': 'view.toolbar', 'num.': 'view.frameSel', 'home': 'view.frameAll', 'shift+c': 'view.cursorReset', 'ctrl+space': 'view.max',
     'num1': 'view.front', 'ctrl+num1': 'view.back', 'num3': 'view.right', 'ctrl+num3': 'view.left', 'num7': 'view.top', 'ctrl+num7': 'view.bottom',
     'num0': 'view.camera', 'num5': 'view.persp', 'ctrl+alt+num0': 'view.alignCam',
-    '1': 'view.front', 'ctrl+1': 'view.back', '3': 'view.right', 'ctrl+3': 'view.left', '7': 'view.top', 'ctrl+7': 'view.bottom', '0': 'view.camera', '5': 'view.persp',
+    '1': 'view.front', '3': 'view.right', '7': 'view.top', '0': 'view.camera', '5': 'view.persp',
+    'ctrl+0': 'mod.subsurf0', 'ctrl+1': 'mod.subsurf1', 'ctrl+2': 'mod.subsurf2', 'ctrl+3': 'mod.subsurf3', 'ctrl+4': 'mod.subsurf4', 'ctrl+5': 'mod.subsurf5',
+    'o': 'edit.prop', 'space': 'anim.play', 'shift+left': 'anim.start', 'shift+right': 'anim.end', 'left': 'anim.prev', 'right': 'anim.next', 'up': 'anim.nextKey', 'down': 'anim.prevKey',
     'a': 'select.all', 'alt+a': 'select.none', 'ctrl+i': 'select.invert', 'b': 'select.box',
     'g': 'obj.grab', 'r': 'obj.rotate', 's': 'obj.scale', 'tab': 'obj.editToggle',
     'z': 'shade.pie', 'shift+z': 'shade.wireToggle', 'alt+z': 'shade.xray', 'shift+alt+z': 'shade.overlays', 'shift+tab': 'snap.toggle',
+    'num/': 'view.local', 'shift+`': 'view.fly', 'ctrl+f12': 'render.anim', 'ctrl+alt+u': 'edit.prefs',
     'w': 'tool.select', 'shift+space': 'tool.menu', 'shift+a': 'menu.add', 'shift+s': 'menu.snap', '.': 'menu.pivot', ',': 'menu.orient', '`': 'menu.view',
   },
   object: {
     'x': 'obj.deleteConfirm', 'delete': 'obj.delete', 'shift+d': 'obj.duplicate', 'h': 'obj.hide', 'shift+h': 'obj.hideOthers', 'alt+h': 'obj.reveal',
     'ctrl+p': 'obj.parent', 'alt+p': 'obj.clearParent', 'ctrl+j': 'obj.join', 'alt+g': 'obj.clearLoc', 'alt+r': 'obj.clearRot', 'alt+s': 'obj.clearScale',
-    'ctrl+a': 'menu.apply', 'f2': 'obj.rename',
+    'ctrl+a': 'menu.apply', 'f2': 'obj.rename', 'i': 'anim.key', 'alt+i': 'anim.keyDel', 'ctrl+c': 'obj.copy', 'ctrl+v': 'obj.paste',
   },
-  edit: { 'x': 'mesh.delete', 'delete': 'mesh.delete', 'm': 'mesh.merge', 'ctrl+l': 'select.linked', 'l': 'select.linked' },
+  edit: { 'x': 'menu.delete', 'delete': 'menu.delete', 'm': 'menu.merge', 'ctrl+l': 'select.linked', 'l': 'select.linked',
+    'ctrl+r': 'mesh.loopcut', 'i': 'mesh.inset', 'shift+d': 'mesh.duplicate', 'p': 'mesh.separate', 'ctrl+num+': 'select.more', 'ctrl+num-': 'select.less', 'alt+i': null,
+    '1': 'selmode.vert', '2': 'selmode.edge', '3': 'selmode.face', 'e': 'mesh.extrude', 'f': 'mesh.fill' },
 };
 function keyString(e) {
   const c = e.code || '';
@@ -3491,7 +4710,7 @@ function keyString(e) {
   if (c.startsWith('Numpad')) { const r = c.slice(6); k = 'num' + ({ Decimal: '.', Add: '+', Subtract: '-', Enter: 'enter', Multiply: '*', Divide: '/' }[r] ?? r); }
   else if (c.startsWith('Key')) k = c.slice(3).toLowerCase();
   else if (c.startsWith('Digit')) k = c.slice(5);
-  else k = { Period: '.', Comma: ',', Backquote: '`', Space: 'space', Tab: 'tab', Delete: 'delete', Backspace: 'backspace', Home: 'home', Escape: 'escape', Enter: 'enter', Minus: '-', Equal: '=' }[c] || (e.key || '').toLowerCase();
+  else k = { Period: '.', Comma: ',', Backquote: '`', Space: 'space', Tab: 'tab', Delete: 'delete', Backspace: 'backspace', Home: 'home', Escape: 'escape', Enter: 'enter', Minus: '-', Equal: '=', ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down', PageUp: 'pageup', PageDown: 'pagedown' }[c] || (e.key || '').toLowerCase();
   return (e.ctrlKey || e.metaKey ? 'ctrl+' : '') + (e.shiftKey ? 'shift+' : '') + (e.altKey ? 'alt+' : '') + k;
 }
 window.addEventListener('keydown', e => {
@@ -3503,6 +4722,11 @@ window.addEventListener('keydown', e => {
   if ($('.dlg-back')) { if (e.key === 'Escape') closeDialog(); return; }
   if (menuStack.length && menuKey(e)) return;
   if (modal) return modalKey(e);
+  if (xmodal) {
+    e.preventDefault();
+    if (e.key === 'Escape') endXModal(false); else if (e.key === 'Enter') endXModal(true); else xmodal.key?.(e);
+    updateXModalHeader(); requestRender(); return;
+  }
   if (e.key === 'Escape') { forceBox = false; return; }
   const ks = keyString(e);
   const orbit = { num4: [-15, 0], num6: [15, 0], num8: [0, 15], num2: [0, -15] }[ks];
@@ -3513,6 +4737,7 @@ window.addEventListener('keydown', e => {
   if (id) { e.preventDefault(); runCmd(id); }
 });
 window.addEventListener('keyup', e => {
+  xmodal?.keyup?.(e);
   if (e.key === 'Control' || e.key === 'Meta') { mouse.ctrl = false; if (modal) updateModal(); if (tc.dragging) updateSnapSettings(); }
   if (e.key === 'Shift') mouse.shift = false;
 });
@@ -3524,7 +4749,7 @@ canvas.addEventListener('pointermove', requestRender, { passive: true });
    Command search (F3)
    ===================================================================== */
 let searchOpen = false, searchIdx = 0, searchItems = [];
-const CAT = { file: 'File', import: 'Import', export: 'Export', edit: 'Edit', render: 'Render', help: 'Help', view: 'View', select: 'Select', add: 'Add', obj: 'Object', snap: 'Snap', mesh: 'Mesh', shade: 'Shading', tool: 'Tool', menu: 'Menu', ws: 'Workspace' };
+const CAT = { anim: 'Animation', selmode: 'Select Mode', mod: 'Modifier', file: 'File', import: 'Import', export: 'Export', edit: 'Edit', render: 'Render', help: 'Help', view: 'View', select: 'Select', add: 'Add', obj: 'Object', snap: 'Snap', mesh: 'Mesh', shade: 'Shading', tool: 'Tool', menu: 'Menu', ws: 'Workspace' };
 function openSearch() {
   closeMenus();
   searchOpen = true; searchIdx = 0;
@@ -3569,7 +4794,7 @@ function sceneToJSON() {
   return {
     app: 'Web3D', version: 1,
     objects: objs.map(o => ({ ...serialize(o, true), parent: o.parent === scene ? -1 : idx.get(o.parent), rotOrder: o.rotation.order })),
-    settings: { world: S.world, render: S.render, solid: S.solid, shading: S.shading },
+    settings: { world: S.world, render: S.render, solid: S.solid, shading: S.shading, anim: { start: anim.start, end: anim.end, fps: anim.fps, frame: anim.frame } },
     view: { target: controls.target.toArray(), position: perspCam.position.toArray() },
     cursor: cursor3d.toArray(), activeCamera: sceneCameraObj ? idx.get(sceneCameraObj) ?? null : null,
   };
@@ -3592,6 +4817,8 @@ async function loadSceneJSON(j, label = 'Open') {
   if (j.activeCamera != null) sceneCameraObj = objs[j.activeCamera] || null;
   if (j.view) { controls.target.fromArray(j.view.target); perspCam.position.fromArray(j.view.position); if (view.ortho) setOrtho(false); controls.update(); }
   if (j.cursor) cursor3d.fromArray(j.cursor);
+  if (j.settings?.anim) Object.assign(anim, j.settings.anim);
+  togglePlay(false); setFrame(anim.frame);
   U.bloomStrength.value = S.render.bloomStrength; U.bloomRadius.value = S.render.bloomRadius; U.bloomThreshold.value = S.render.bloomThreshold; U.thickness.value = S.render.outlineWidth;
   camerasAspectChanged();
   applyShading();
@@ -3599,7 +4826,8 @@ async function loadSceneJSON(j, label = 'Open') {
   resetHistory(label);
   return true;
 }
-function autosaveNow() { if (!store.set('web3d.autosave', sceneToJSON())) { if (!autosaveNow.warned) { autosaveNow.warned = true; console.warn('Autosave skipped: storage quota exceeded'); } } }
+function autosaveNow() {
+  if (prefs.autosave === false) return; if (!store.set('web3d.autosave', sceneToJSON())) { if (!autosaveNow.warned) { autosaveNow.warned = true; console.warn('Autosave skipped: storage quota exceeded'); } } }
 const autosave = debounce(autosaveNow, 1500);
 async function recoverAutosave() { const j = store.get('web3d.autosave', null); if (j && await loadSceneJSON(j, 'Recover Auto Save')) toast('Recovered last session', 'ok'); }
 async function saveFile() {
@@ -3760,6 +4988,271 @@ async function renderImage() {
 }
 
 /* =====================================================================
+   Clipboard, local view, fly navigation
+   ===================================================================== */
+function copySelected() {
+  const list = selectedList();
+  if (!list.length) return;
+  scene.updateMatrixWorld();
+  const idx = new Map(list.map((o, i) => [o, i]));
+  const data = list.map(o => ({ ...serialize(o, true), parent: idx.has(o.parent) ? idx.get(o.parent) : -1, world: o.matrixWorld.toArray(), rotOrder: o.rotation.order }));
+  if (!store.set('web3d.clipboard', data)) { toast('Clipboard too large', 'err'); return; }
+  toast(`Copied ${list.length} object${list.length > 1 ? 's' : ''}`);
+}
+async function pasteObjects() {
+  const data = store.get('web3d.clipboard', null);
+  if (!data?.length) { toast('Clipboard is empty', 'warn'); return; }
+  if (isEdit()) exitEdit();
+  if (data.some(d => d.prim === 'text')) await loadFont().catch(() => {});
+  const objs = data.map(d => { const o = deserialize(d); o.rotation.reorder(d.rotOrder || 'ZYX'); scene.add(o); if (o.userData.proxy) o.userData.proxy.visible = S.overlays; return o; });
+  data.forEach((d, i) => {
+    if (d.parent >= 0) objs[d.parent].add(objs[i]);
+    else new THREE.Matrix4().fromArray(d.world).decompose(objs[i].position, objs[i].quaternion, objs[i].scale);
+  });
+  applyShading();
+  setSel(objs, objs[objs.length - 1]);
+  pushHistory('Paste Objects');
+  toast(`Pasted ${objs.length} object${objs.length > 1 ? 's' : ''}`, 'ok');
+}
+function toggleLocalView() {
+  if (view.local) {
+    for (const o of view.local.hidden) { o.userData.localHidden = false; if (o.parent) o.visible = true; }
+    const { t, p } = view.local;
+    view.local = null;
+    animateView(t, p.clone().sub(t), p.distanceTo(t));
+  } else {
+    if (isEdit()) return;
+    const keep = new Set();
+    for (const o of selectedList()) { o.traverse(c => keep.add(c)); for (let q = o.parent; q && q !== scene; q = q.parent) keep.add(q); }
+    if (!keep.size) { toast('Select objects to isolate', 'warn'); return; }
+    const hidden = userObjects().filter(o => o.visible && !keep.has(o));
+    hidden.forEach(o => { o.visible = false; o.userData.localHidden = true; });
+    view.local = { hidden, t: controls.target.clone(), p: viewCam.position.clone() };
+    frameSelected();
+  }
+  onSelChanged(); markUI('info');
+}
+function exitLocalView() { if (view.local) { for (const o of view.local.hidden) { o.userData.localHidden = false; if (o.parent) o.visible = true; } view.local = null; } }
+function startFly() {
+  if (view.camView) exitCameraView();
+  if (view.ortho) { view.autoOrtho = false; setOrtho(false); }
+  viewAnim = null;
+  const cam = perspCam, save = { p: cam.position.clone(), q: cam.quaternion.clone(), t: controls.target.clone() };
+  const f = camForward();
+  let yaw = Math.atan2(f.y, f.x), pitch = Math.asin(clamp(f.z, -1, 1));
+  const keys = new Set(), dist = Math.max(0.5, cam.position.distanceTo(controls.target));
+  let speed = Math.max(1, dist * 0.6), last = performance.now();
+  controls.enabled = false;
+  canvas.requestPointerLock?.()?.catch?.(() => {});
+  const look = () => { const d = new THREE.Vector3(Math.cos(pitch) * Math.cos(yaw), Math.cos(pitch) * Math.sin(yaw), Math.sin(pitch)); cam.lookAt(cam.position.clone().add(d)); return d; };
+  startXModal({
+    name: 'Fly',
+    header: () => `Fly Navigation · Speed <b>${fmt(speed, 2)}</b> m/s &nbsp;<span style="color:var(--txt3)">WASD move · Q/E down/up · Shift fast · wheel speed</span>`,
+    hints: [['mouse-l', 'Confirm'], ['mouse-r', 'Cancel'], ['W A S D', 'Move'], ['Q E', 'Down / Up']],
+    look(e) { yaw -= e.movementX * 0.0025; pitch = clamp(pitch - e.movementY * 0.0025, -1.55, 1.55); look(); },
+    wheel(d) { speed = clamp(speed * (d < 0 ? 1.2 : 1 / 1.2), 0.01, 1e4); },
+    key(e) { keys.add(e.code); }, keyup(e) { keys.delete(e.code); },
+    frame(now) {
+      const dt = Math.min(0.1, (now - last) / 1000); last = now;
+      const d = look(), right = d.clone().cross(AXES.z).normalize(), v = new THREE.Vector3();
+      if (keys.has('KeyW') || keys.has('ArrowUp')) v.add(d); if (keys.has('KeyS') || keys.has('ArrowDown')) v.sub(d);
+      if (keys.has('KeyD') || keys.has('ArrowRight')) v.add(right); if (keys.has('KeyA') || keys.has('ArrowLeft')) v.sub(right);
+      if (keys.has('KeyE') || keys.has('Space')) v.z += 1; if (keys.has('KeyQ')) v.z -= 1;
+      if (v.lengthSq()) cam.position.addScaledVector(v.normalize(), speed * dt * (keys.has('ShiftLeft') || keys.has('ShiftRight') ? 3 : 1));
+      return true;
+    },
+    confirm() { controls.target.copy(cam.position).addScaledVector(camForward(), dist); },
+    cancel() { cam.position.copy(save.p); cam.quaternion.copy(save.q); controls.target.copy(save.t); },
+    end() { if (document.pointerLockElement) document.exitPointerLock(); controls.enabled = true; controls.update(); },
+  });
+}
+
+/* =====================================================================
+   Viewport overlays: wireframe & face orientation
+   ===================================================================== */
+const faceOrientMat = new THREE.MeshBasicNodeMaterial({ side: THREE.DoubleSide });
+faceOrientMat.colorNode = frontFacing.select(vec3(0.12, 0.3, 1.0), vec3(1.0, 0.1, 0.1));
+const wireOvMat = new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.4, depthWrite: false });
+const quadEdgeCache = new WeakMap();
+function quadEdgesGeometry(g) {
+  let lg = quadEdgeCache.get(g);
+  if (lg) return lg;
+  const pm = trisToPolys(weldGeo(g)), seen = new Set(), pos = [], nv = pm.P.length / 3;
+  for (const f of pm.F) for (let i = 0; i < f.length; i++) {
+    const a = f[i], b = f[(i + 1) % f.length], k = a < b ? a * nv + b : b * nv + a;
+    if (seen.has(k)) continue; seen.add(k);
+    pos.push(pm.P[a * 3], pm.P[a * 3 + 1], pm.P[a * 3 + 2], pm.P[b * 3], pm.P[b * 3 + 1], pm.P[b * 3 + 2]);
+  }
+  lg = new THREE.BufferGeometry();
+  lg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  quadEdgeCache.set(g, lg);
+  return lg;
+}
+function syncWireOverlays() {
+  const on = S.overlays && S.ov.wireframe && S.shading !== 'wire';
+  for (const o of userObjects()) {
+    if (o.userData.kind !== 'mesh') continue;
+    const u = o.userData, want = on && isShown(o) && !(isEdit() && o === edit.obj) && (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) < 6e5;
+    if (!want) { if (u.wireOv) { u.wireOv.removeFromParent(); u.wireOv = null; } continue; }
+    if (!u.wireOv) { u.wireOv = new THREE.LineSegments(quadEdgesGeometry(o.geometry), wireOvMat); u.wireOv.raycast = () => {}; u.wireOv.name = '__wire'; o.add(u.wireOv); }
+    else if (u.wireOv.geometry !== quadEdgeCache.get(o.geometry)) u.wireOv.geometry = quadEdgesGeometry(o.geometry);
+  }
+}
+
+/* =====================================================================
+   Generated textures & image planes
+   ===================================================================== */
+function genTexture(kind) {
+  const N = 1024, c = document.createElement('canvas'); c.width = c.height = N;
+  const g = c.getContext('2d');
+  if (kind === 'checker') {
+    for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) { g.fillStyle = (x + y) % 2 ? '#2a2a2c' : '#d9d9d9'; g.fillRect(x * N / 8, y * N / 8, N / 8, N / 8); }
+  } else if (kind === 'uvgrid') {
+    for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
+      g.fillStyle = `hsl(${(x * 45 + y * 12) % 360},55%,${(x + y) % 2 ? 46 : 58}%)`; g.fillRect(x * N / 8, y * N / 8, N / 8, N / 8);
+      g.fillStyle = 'rgba(255,255,255,.9)'; g.font = 'bold 34px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText('ABCDEFGH'[x] + (8 - y), x * N / 8 + N / 16, y * N / 8 + N / 16);
+    }
+    g.strokeStyle = 'rgba(0,0,0,.6)'; g.lineWidth = 3;
+    for (let i = 0; i <= 8; i++) { g.beginPath(); g.moveTo(i * N / 8, 0); g.lineTo(i * N / 8, N); g.moveTo(0, i * N / 8); g.lineTo(N, i * N / 8); g.stroke(); }
+  } else if (kind === 'noise' || kind === 'marble') {
+    g.fillStyle = '#808080'; g.fillRect(0, 0, N, N);
+    for (let oct = 0; oct < 6; oct++) {
+      const s = 4 << oct, sm = document.createElement('canvas'); sm.width = sm.height = s;
+      const sg = sm.getContext('2d'), id = sg.createImageData(s, s);
+      for (let i = 0; i < s * s; i++) { const v = Math.random() * 255; id.data.set([v, v, v, 255], i * 4); }
+      sg.putImageData(id, 0, 0);
+      g.globalAlpha = 0.55 / (oct * 0.6 + 1); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+      g.drawImage(sm, 0, 0, N, N);
+    }
+    g.globalAlpha = 1;
+    if (kind === 'marble') {
+      const id = g.getImageData(0, 0, N, N), d = id.data;
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+        const i = (y * N + x) * 4, n = d[i] / 255, v = 0.5 + 0.5 * Math.sin((x / N) * 18 + n * 9);
+        const w = Math.pow(v, 0.35);
+        d[i] = 230 * w + 25; d[i + 1] = 226 * w + 22; d[i + 2] = 218 * w + 20;
+      }
+      g.putImageData(id, 0, 0);
+    }
+  } else if (kind === 'bricks') {
+    g.fillStyle = '#d8d2c8'; g.fillRect(0, 0, N, N);
+    const bw = N / 4, bh = N / 8;
+    for (let r = 0; r < 8; r++) for (let k = -1; k < 5; k++) {
+      const x = k * bw + (r % 2 ? bw / 2 : 0) + 6, y = r * bh + 6;
+      g.fillStyle = `hsl(${8 + Math.random() * 10},${45 + Math.random() * 15}%,${32 + Math.random() * 12}%)`;
+      g.fillRect(x, y, bw - 12, bh - 12);
+    }
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8;
+  t.name = { checker: 'Checker', uvgrid: 'UV Grid', noise: 'Noise', marble: 'Marble', bricks: 'Bricks' }[kind];
+  return t;
+}
+async function addImagePlane() {
+  const f = await pickFile('image/*');
+  if (!f) return;
+  const url = URL.createObjectURL(f);
+  const tex = await new THREE.TextureLoader().loadAsync(url);
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; tex.name = f.name;
+  const a = tex.image.width / tex.image.height;
+  const o = newCustomMesh(new THREE.PlaneGeometry(2 * a, 2), f.name.replace(/\.[^.]+$/, ''), { map: tex, color: '#ffffff', roughness: 0.8, side: 'double', flatShading: true });
+  o.rotation.x = Math.PI / 2;
+  addObject(o, 'Add Image as Plane');
+  o.position.z += 1;
+  pushHistory('Move');
+}
+
+/* =====================================================================
+   Render animation (WebM video via MediaRecorder)
+   ===================================================================== */
+async function renderAnimation() {
+  if (rendering) return;
+  if (!canvas.captureStream || !window.MediaRecorder) { toast('Video recording is not supported in this browser', 'err'); return; }
+  const W = S.render.width, H = S.render.height, total = anim.end - anim.start + 1;
+  const mime = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4'].find(t => MediaRecorder.isTypeSupported(t));
+  if (!mime) { toast('No supported video format', 'err'); return; }
+  rendering = true; togglePlay(false);
+  let cancelled = false;
+  const bar = h('i', { style: 'display:block;height:100%;width:0;background:var(--accent);transition:width .1s' }), label = h('div', { class: 'info' }, 'Preparing…');
+  dialog('Rendering Animation', h('div', { style: 'width:min(380px,80vw)' }, label, h('div', { style: 'height:6px;border-radius:3px;background:var(--bg1);overflow:hidden;margin-top:8px' }, bar)),
+    [btn('Cancel', () => { cancelled = true; })], 'render');
+  const prevSh = S.shading, prevFrame = anim.frame, pr = renderer.getPixelRatio(), size = renderer.getSize(new THREE.Vector2());
+  S.shading = 'rendered'; applyShading();
+  helpers.visible = false;
+  userObjects().forEach(o => { if (o.userData.proxy) o.userData.proxy.visible = false; if (o.userData.wireOv) o.userData.wireOv.visible = false; });
+  renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+  const cam = new THREE.PerspectiveCamera(40, W / H, 0.05, 4000);
+  const rp = new THREE.RenderPipeline(renderer);
+  rp.outputColorTransform = false;
+  const sp = pass(scene, cam, { samples: 4 });
+  rp.outputNode = renderOutput(S.render.bloom ? sp.add(bloom(sp, U.bloomStrength, U.bloomRadius, U.bloomThreshold)) : sp, TONE[S.render.tone], THREE.SRGBColorSpace);
+  const stream = canvas.captureStream(0), track = stream.getVideoTracks()[0];
+  const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 16e6 }), chunks = [];
+  rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+  const stopped = new Promise(r => { rec.onstop = r; });
+  rec.start();
+  const camObj = activeSceneCamera();
+  try {
+    for (let f = anim.start; f <= anim.end && !cancelled; f++) {
+      anim.frame = f; evalAnimation(); scene.updateMatrixWorld(true);
+      if (camObj) { const c = camObj.userData.cam; c.matrixWorld.decompose(cam.position, cam.quaternion, _v2); cam.fov = c.fov; cam.near = c.near; cam.far = c.far; }
+      else { cam.position.copy(perspCam.position); cam.quaternion.copy(perspCam.quaternion); cam.fov = perspCam.fov; }
+      cam.aspect = W / H; cam.updateProjectionMatrix(); cam.updateMatrixWorld();
+      rp.render();
+      track.requestFrame?.();
+      bar.style.width = ((f - anim.start + 1) / total * 100) + '%';
+      label.textContent = `Frame ${f} / ${anim.end}`;
+      await new Promise(r => setTimeout(r, 1000 / anim.fps));
+    }
+  } catch (err) { console.error(err); toast('Render failed: ' + err.message, 'err'); cancelled = true; }
+  rec.stop(); await stopped;
+  rp.dispose();
+  renderer.setPixelRatio(pr); renderer.setSize(size.x, size.y, false);
+  helpers.visible = true;
+  S.shading = prevSh; applyShading(); updateOverlayVisibility(); updateSelectionVisuals();
+  userObjects().forEach(o => { if (o.userData.wireOv) o.userData.wireOv.visible = true; });
+  rendering = false; setFrame(prevFrame); closeDialog(); requestRender();
+  if (!cancelled && chunks.length) {
+    const blob = new Blob(chunks, { type: mime.split(';')[0] }), url = URL.createObjectURL(blob);
+    const vid = h('video', { src: url, controls: true, autoplay: true, loop: true, class: 'render-img' });
+    dialog(`Animation — ${W} × ${H} · ${total} frames`, vid, [btn('Save Video', () => download('animation.' + (mime.includes('mp4') ? 'mp4' : 'webm'), blob), 'save', 'primary'), btn('Close', closeDialog)], 'render');
+  } else if (cancelled) toast('Animation render cancelled', 'warn');
+}
+
+/* =====================================================================
+   Preferences
+   ===================================================================== */
+function applyPrefs() {
+  const acc = prefs.accent || '#4d7fe0', c = new THREE.Color(acc), d = c.clone().multiplyScalar(0.78), rgb = `${Math.round(c.r * 255)},${Math.round(c.g * 255)},${Math.round(c.b * 255)}`;
+  const r = document.documentElement.style;
+  r.setProperty('--accent', acc); r.setProperty('--accent2', '#' + d.getHexString());
+  r.setProperty('--accent-soft', `rgba(${rgb},.18)`); r.setProperty('--accent-glow', `rgba(${rgb},.45)`);
+  controls.zoomToCursor = prefs.zoomToMouse !== false;
+  controls.rotateSpeed = 0.9 * (prefs.orbitSpeed ?? 1);
+  tc.setSize(prefs.gizmoSize ?? 0.95);
+  markUI('timeline'); requestRender();
+}
+function showPrefs() {
+  const P = (k, d) => prefs[k] ?? d;
+  const set = (k, v) => { prefs[k] = v; store.set('web3d.prefs', prefs); applyPrefs(); };
+  const chk = (label, k, d) => checkField(label, () => P(k, d), v => set(k, v), null);
+  const accents = ['#4d7fe0', '#ff8a1f', '#3fbf7f', '#c062e8', '#e0524d', '#e0b43a', '#3ab7c9'];
+  const sw = h('div', { style: 'display:flex;gap:6px;flex-wrap:wrap' }, ...accents.map(a => {
+    const b = h('button', { style: `width:22px;height:22px;border-radius:50%;border:2px solid ${P('accent', '#4d7fe0') === a ? '#fff' : 'transparent'};background:${a};cursor:pointer` });
+    b.addEventListener('click', () => { set('accent', a); showPrefs(); }); return b;
+  }));
+  dialog('Preferences', h('div', { style: 'width:min(420px,84vw);display:flex;flex-direction:column;gap:4px' },
+    panel('pf-ui', 'Interface', [field('Accent Color', sw), chk('Show Splash Screen on Startup', 'splash', true),
+      field('Gizmo Size', numField({ get: () => P('gizmoSize', 0.95), set: v => set('gizmoSize', v), min: 0.3, max: 3, slider: true, softMin: 0.3, softMax: 2, commit: null }))]),
+    panel('pf-nav', 'Navigation', [chk('Zoom to Mouse Position', 'zoomToMouse', true), chk('Auto Perspective (ortho on axis views)', 'autoPersp', true),
+      field('Orbit Sensitivity', numField({ get: () => P('orbitSpeed', 1), set: v => set('orbitSpeed', v), min: 0.1, max: 4, slider: true, softMin: 0.1, softMax: 3, commit: null }))]),
+    panel('pf-save', 'Save & Load', [chk('Auto Save to Browser Storage', 'autosave', true),
+      h('div', { class: 'btn-row' }, btn('Clear Auto Save', () => { try { localStorage.removeItem('web3d.autosave'); toast('Auto save cleared'); } catch {} }, 'trash'))]),
+  ), [btn('Close', closeDialog, null, 'primary')], 'gear');
+}
+
+/* =====================================================================
    Dialogs, splash & help
    ===================================================================== */
 function dialog(title, content, buttons = [], icon, width) {
@@ -3788,12 +5281,13 @@ function confirmNew() {
 }
 function showShortcuts() {
   const S_ = [
-    ['Navigation', [['Orbit', 'MMB / Alt LMB'], ['Pan', 'Shift MMB'], ['Zoom', 'Wheel / Ctrl ='], ['Front / Right / Top', 'Numpad 1 3 7'], ['Opposite view', 'Ctrl Numpad 1 3 7'], ['Orbit step', 'Numpad 2 4 6 8'], ['Persp / Ortho', 'Numpad 5'], ['Camera view', 'Numpad 0'], ['Align camera to view', 'Ctrl Alt Numpad 0'], ['Frame selected', 'Numpad .'], ['Frame all', 'Home'], ['View menu', '`']]],
+    ['Navigation', [['Orbit', 'MMB / Alt LMB'], ['Pan', 'Shift MMB'], ['Zoom', 'Wheel / Ctrl ='], ['Front / Right / Top', 'Numpad 1 3 7'], ['Opposite view', 'Ctrl Numpad 1 3 7'], ['Orbit step', 'Numpad 2 4 6 8'], ['Persp / Ortho', 'Numpad 5'], ['Camera view', 'Numpad 0'], ['Align camera to view', 'Ctrl Alt Numpad 0'], ['Frame selected', 'Numpad .'], ['Frame all', 'Home'], ['Local view', 'Numpad /'], ['Fly navigation', 'Shift `'], ['View menu', '`']]],
     ['Selection', [['Select', 'LMB'], ['Extend / toggle', 'Shift LMB'], ['Box select', 'LMB drag / B'], ['Subtract box', 'Ctrl LMB drag'], ['Select all', 'A'], ['Deselect all', 'Alt A'], ['Invert', 'Ctrl I'], ['Place 3D cursor', 'Shift RMB']]],
     ['Transform', [['Move / Rotate / Scale', 'G R S'], ['Constrain axis', 'X Y Z (twice = local)'], ['Constrain plane', 'Shift X Y Z'], ['Snap while moving', 'Hold Ctrl'], ['Type exact value', '0-9 . -'], ['Confirm / Cancel', 'LMB · Enter / RMB · Esc'], ['Clear loc / rot / scale', 'Alt G R S'], ['Apply transforms', 'Ctrl A'], ['Snap menu', 'Shift S'], ['Pivot / Orientation', '. / ,'], ['Toggle snapping', 'Shift Tab']]],
-    ['Objects', [['Add', 'Shift A'], ['Duplicate', 'Shift D'], ['Delete', 'X / Delete'], ['Hide / Unhide', 'H / Alt H'], ['Hide unselected', 'Shift H'], ['Parent / Clear', 'Ctrl P / Alt P'], ['Join', 'Ctrl J'], ['Rename', 'F2'], ['Context menu', 'RMB']]],
-    ['Edit Mode', [['Toggle', 'Tab'], ['Select linked', 'L / Double-click'], ['Merge at center', 'M'], ['Delete vertices', 'X']]],
-    ['View & App', [['Shading menu', 'Z'], ['Wireframe toggle', 'Shift Z'], ['X-Ray', 'Alt Z'], ['Overlays', 'Shift Alt Z'], ['Sidebar / Toolbar', 'N / T'], ['Maximize viewport', 'Ctrl Space'], ['Search commands', 'F3'], ['Render image', 'F12'], ['Undo / Redo', 'Ctrl Z / Ctrl Shift Z'], ['Save / Open', 'Ctrl S / Ctrl O']]],
+    ['Objects', [['Add', 'Shift A'], ['Duplicate', 'Shift D'], ['Delete', 'X / Delete'], ['Hide / Unhide', 'H / Alt H'], ['Hide unselected', 'Shift H'], ['Parent / Clear', 'Ctrl P / Alt P'], ['Join', 'Ctrl J'], ['Copy / Paste', 'Ctrl C / Ctrl V'], ['Rename', 'F2'], ['Context menu', 'RMB']]],
+    ['Edit Mode', [['Toggle', 'Tab'], ['Vertex / Edge / Face mode', '1 / 2 / 3'], ['Extrude region', 'E'], ['Inset faces', 'I'], ['Loop cut', 'Ctrl R'], ['Edge / face loop select', 'Alt click'], ['Grow / shrink selection', 'Ctrl Numpad + / Ctrl Numpad -'], ['Duplicate', 'Shift D'], ['Separate', 'P'], ['Subdivide', 'RMB menu'], ['Fill face', 'F'], ['Select linked', 'L / Double-click'], ['Merge menu', 'M'], ['Delete menu', 'X'], ['Proportional editing', 'O'], ['Proportional radius', 'Wheel / PageUp']]],
+    ['Modifiers & Animation', [['Subdivision Surface level', 'Ctrl 0-5'], ['Insert keyframe', 'I'], ['Delete keyframe', 'Alt I'], ['Play / Pause', 'Space'], ['Step frame', '← / →'], ['Jump to keyframe', '↑ / ↓'], ['Start / End', 'Shift ← / Shift →']]],
+    ['View & App', [['Shading menu', 'Z'], ['Wireframe toggle', 'Shift Z'], ['X-Ray', 'Alt Z'], ['Overlays', 'Shift Alt Z'], ['Sidebar / Toolbar', 'N / T'], ['Maximize viewport', 'Ctrl Space'], ['Search commands', 'F3'], ['Render image', 'F12'], ['Render animation', 'Ctrl F12'], ['Preferences', 'Ctrl Alt U'], ['Undo / Redo', 'Ctrl Z / Ctrl Shift Z'], ['Save / Open', 'Ctrl S / Ctrl O']]],
   ];
   const g = h('div', { class: 'keys' });
   for (const [title, rows] of S_) { g.append(h('h4', {}, title)); for (const [a, b] of rows) g.append(h('div', {}, h('span', {}, a), h('span', {}, ...b.split(' / ').flatMap((k, i) => i ? [' / ', KBD(k)] : [KBD(k)])))); }
@@ -3858,10 +5352,13 @@ async function loadDemo() {
   const put = (o, p, r) => { if (p) o.position.set(...p); if (r) o.rotation.set(...r.map(v => v * DEG)); scene.add(o); return o; };
   const P = n => ({ ...PRESET_RESET, ...MAT_PRESETS.find(m => m.name === n) });
   put(newMesh('plane', { size: 40 }, { name: 'Ground', mat: { color: '#7c8088', roughness: 0.92 } }));
-  put(newMesh('torusknot', { radius: 0.85, tube: 0.28 }, { name: 'Gold Knot', mat: P('Gold') }), [0, 0.4, 1.55]);
+  const knot = put(newMesh('torusknot', { radius: 0.85, tube: 0.28 }, { name: 'Gold Knot', mat: P('Gold') }), [0, 0.4, 1.55]);
+  knot.userData.keys = [0, 1, 2, 3].map(i => ({ f: 1 + i * 40, p: [0, 0.4, 1.55 + (i % 2) * 0.35], q: new THREE.Quaternion().setFromAxisAngle(AXES.z, i * Math.PI * 2 / 3).toArray(), s: [1, 1, 1] }));
+  Object.assign(anim, { start: 1, end: 120, frame: 1 });
   put(newMesh('uvsphere', { radius: 0.9, segments: 64, rings: 32 }, { name: 'Glass Orb', mat: P('Glass') }), [-2.9, 1.2, 0.9]);
   put(newMesh('uvsphere', { radius: 0.75, segments: 64, rings: 32 }, { name: 'Chrome Ball', mat: P('Chrome') }), [2.9, 1.8, 0.75]);
-  put(newMesh('cube', { size: 1.2 }, { name: 'Plastic Box', mat: P('Plastic') }), [2.4, -2.2, 0.6], [0, 0, 24]);
+  const box = put(newMesh('cube', { size: 1.3 }, { name: 'Rounded Box', mat: P('Plastic'), smooth: true }), [2.4, -2.2, 0.55], [0, 0, 24]);
+  addModifier(box, 'subsurf', { levels: 3 });
   put(newMesh('torus', { majorRadius: 0.95, minorRadius: 0.11, majorSegments: 96, minorSegments: 16 }, { name: 'Neon Ring', mat: P('Neon') }), [-2.4, -2.3, 0.11]);
   put(newMesh('cylinder', { radius: 0.45, depth: 1.8 }, { name: 'Ceramic Vase', smooth: true, mat: P('Ceramic') }), [-0.4, 3.4, 0.9]);
   put(newMesh('capsule', { radius: 0.45, length: 0.9 }, { name: 'Velvet Capsule', mat: P('Velvet') }), [4.6, -0.6, 0.9]);
@@ -3882,7 +5379,8 @@ async function loadDemo() {
   setShading('rendered');
   $$('.ws-tab').forEach(b => b.classList.toggle('active', b.dataset.ws === 'rendering'));
   resetHistory('Load Demo Scene');
-  toast('Demo scene loaded — orbit with MMB or Alt + LMB', 'ok');
+  setFrame(1);
+  toast('Demo scene loaded — press Space to play the animation', 'ok');
 }
 
 /* =====================================================================
@@ -3923,17 +5421,22 @@ function flushUI() {
   if (dirty.stats) { dirty.stats = false; renderStatus(); dirty.info = true; }
   if (dirty.info) { dirty.info = false; renderInfo(); }
   if (dirty.hints) { dirty.hints = false; renderHints(); }
+  if (dirty.timeline) { dirty.timeline = false; drawTimeline(); }
 }
 const _wq = new THREE.Quaternion();
 function loop(now) {
-  const anim = updateViewAnim(now);
+  if (rendering) return;
+  stepAnimation(now);
+  if (xmodal?.frame?.(now)) requestRender();
+  const animating = updateViewAnim(now);
   const moved = controls.enabled && !view.camView && !viewAnim ? controls.update() : false;
   flushUI();
-  if (!needsRender && !moved && !anim) return;
+  if (!needsRender && !moved && !animating) return;
   needsRender = false;
   if (!tc.dragging && !modal) syncGizmo();
   if (view.camView) syncCamView();
   updateStudioRig();
+  syncWireOverlays();
   const cq = viewCam.getWorldQuaternion(new THREE.Quaternion());
   scene.traverse(o => {
     const b = o.userData.billboard;
@@ -3957,13 +5460,13 @@ const recover = store.get('web3d.recoverOnLoad', false);
 store.set('web3d.recoverOnLoad', false);
 newDefaultScene();
 if (recover) await recoverAutosave();
-setTool('select'); headerUI(); modeUI(); updateUndoButtons();
+setTool('select'); headerUI(); modeUI(); updateUndoButtons(); applyPrefs();
 renderer.setAnimationLoop(loop);
-window.web3d = { THREE, scene, renderer, S, sel, runCmd, CMDS, get active() { return active; }, edit, hist, view, controls };
+window.web3d = { THREE, scene, renderer, S, sel, runCmd, CMDS, sceneToJSON, loadSceneJSON, anim, _dbg: { edgeRing, loopCutGeometry, trisToPolys, weldGeo }, get active() { return active; }, edit, hist, view, controls };
 setTimeout(() => {
   $('#loading').classList.add('done');
   setTimeout(() => $('#loading').remove(), 600);
-  if (!recover && !new URLSearchParams(location.search).has('nosplash')) showSplash();
+  if (!recover && prefs.splash !== false && !new URLSearchParams(location.search).has('nosplash')) showSplash();
   if (BACKEND !== 'WebGPU') toast('WebGPU unavailable — running on the WebGL 2 fallback', 'warn');
 }, 250);
 </script>
